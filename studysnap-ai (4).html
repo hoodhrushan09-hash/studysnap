@@ -1,0 +1,2966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StudySnap AI — Snap. Solve. Understand.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#080812;color:#dddaf5;overflow:hidden}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:rgba(124,58,237,.35);border-radius:2px}
+button,input,textarea,select{font-family:inherit;outline:none}
+img{max-width:100%}
+
+/* ═══════════════════════════════════════════════════
+   CSS VARIABLES
+═══════════════════════════════════════════════════ */
+:root{
+  --bg:#080812;
+  --card:#0f0f22;
+  --card2:#16162e;
+  --border:rgba(120,80,255,.18);
+  --text:#dddaf5;
+  --muted:#7070a0;
+  --accent:#7c3aed;
+  --blue:#3b82f6;
+  --green:#10b981;
+  --amber:#f59e0b;
+  --red:#ef4444;
+  --teal:#0d9488;
+  --islamic:#16a34a;
+  --grad-main:linear-gradient(135deg,#7c3aed,#6366f1);
+  --grad-blue:linear-gradient(135deg,#3b82f6,#6366f1);
+  --grad-green:linear-gradient(135deg,#10b981,#06b6d4);
+  --grad-amber:linear-gradient(135deg,#f59e0b,#ef4444);
+  --grad-islamic:linear-gradient(135deg,#16a34a,#0d9488);
+  --grad-pink:linear-gradient(135deg,#ec4899,#f43f5e);
+  --shadow:0 8px 32px rgba(0,0,0,.4);
+  --radius:18px;
+  --radius-sm:12px;
+}
+.light-mode{
+  --bg:#f0f4ff;
+  --card:#ffffff;
+  --card2:#f5f6ff;
+  --border:rgba(99,102,241,.12);
+  --text:#1a1a2e;
+  --muted:#8080b0;
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+#app{
+  max-width:430px;
+  margin:0 auto;
+  height:100vh;
+  position:relative;
+  overflow:hidden;
+  background:var(--bg);
+}
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+}
+.screen.active{display:flex}
+
+/* ambient glow */
+#app::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  max-width:430px;
+  margin:0 auto;
+  background:
+    radial-gradient(ellipse at 15% 0%,rgba(124,58,237,.14) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 100%,rgba(59,130,246,.08) 0%,transparent 55%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.97)}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(124,58,237,.4)}50%{box-shadow:0 0 50px rgba(124,58,237,.8)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes slideUp{from{opacity:0;transform:translateY(100%)}to{opacity:1;transform:translateY(0)}}
+@keyframes dot1{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes dot2{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes dot3{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+.animate-fadeup{animation:fadeUp .4s ease forwards}
+.animate-fadein{animation:fadeIn .3s ease forwards}
+.animate-pulse{animation:pulse 2s infinite}
+
+/* ═══════════════════════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════════════════════ */
+#splash{
+  background:linear-gradient(160deg,#04040e 0%,#130a2a 50%,#050515 100%);
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:0;
+  z-index:10;
+}
+.splash-logo{
+  font-size:64px;
+  margin-bottom:12px;
+  animation:glow 2s infinite;
+  display:inline-block;
+  padding:16px;
+  border-radius:24px;
+  background:rgba(124,58,237,.15);
+  border:2px solid rgba(124,58,237,.4);
+}
+.splash-title{
+  font-size:30px;
+  font-weight:900;
+  background:linear-gradient(135deg,#c4b5fd,#93c5fd);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:6px;
+}
+.splash-tag{font-size:13px;color:#8b8aaa;letter-spacing:3px;font-weight:600}
+.splash-dots{display:flex;gap:8px;margin-top:40px}
+.splash-dot{height:8px;border-radius:4px;transition:all .3s}
+.splash-dot:nth-child(1){width:8px;background:#1e1e3a}
+.splash-dot:nth-child(2){width:28px;background:linear-gradient(90deg,#7c3aed,#60a5fa)}
+.splash-dot:nth-child(3){width:8px;background:#1e1e3a}
+.splash-loading{margin-top:20px;color:#555580;font-size:12px;font-weight:600;letter-spacing:1px;animation:pulse 2s infinite}
+
+/* ═══════════════════════════════════════════════════
+   ONBOARDING
+═══════════════════════════════════════════════════ */
+#onboarding{
+  overflow-y:auto;
+  z-index:9;
+  background:var(--bg);
+}
+.ob-progress{
+  display:flex;
+  gap:6px;
+  padding:20px 24px 0;
+}
+.ob-prog-bar{
+  height:4px;
+  border-radius:2px;
+  flex:1;
+  background:rgba(255,255,255,.08);
+  transition:background .4s;
+}
+.ob-prog-bar.done{background:var(--grad-main)}
+.ob-step{
+  padding:28px 22px 20px;
+  display:none;
+  animation:fadeUp .4s ease;
+}
+.ob-step.active{display:block}
+.ob-icon{font-size:48px;margin-bottom:12px;text-align:center}
+.ob-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:6px}
+.ob-sub{font-size:13px;color:var(--muted);text-align:center;line-height:1.7;margin-bottom:24px}
+
+.grade-card{
+  padding:15px 16px;
+  border-radius:16px;
+  border:2px solid var(--border);
+  background:transparent;
+  cursor:pointer;
+  text-align:left;
+  width:100%;
+  transition:all .2s;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+  color:var(--text);
+}
+.grade-card:hover{transform:scale(1.01)}
+.grade-card.selected{transform:scale(1.02)}
+.grade-card-icon{
+  font-size:30px;
+  width:50px;height:50px;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.grade-card-name{font-weight:800;font-size:15px;margin-bottom:2px}
+.grade-card-meta{font-size:12px;color:var(--muted);margin-bottom:5px}
+.grade-card-tags{display:flex;gap:4px;flex-wrap:wrap}
+.grade-tag{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700}
+.grade-check{font-size:20px;margin-left:auto;opacity:0;transition:opacity .2s}
+.grade-card.selected .grade-check{opacity:1}
+
+.name-input-wrap{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:4px 16px;
+  background:var(--card);
+  margin-bottom:14px;
+  transition:border-color .2s;
+}
+.name-input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,58,237,.2)}
+.name-input{
+  width:100%;
+  background:transparent;
+  border:none;
+  padding:14px 0;
+  color:var(--text);
+  font-size:18px;
+  font-weight:700;
+}
+.name-quick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.name-chip{
+  padding:7px 14px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-size:13px;font-weight:700;
+  cursor:pointer;
+  transition:all .2s;
+}
+.name-chip.selected,.name-chip:hover{color:var(--accent);border-color:var(--accent);background:rgba(124,58,237,.12)}
+
+.goal-card{
+  padding:13px 15px;
+  border-radius:15px;
+  border:2px solid var(--border);
+  background:transparent;
+  cursor:pointer;
+  text-align:left;
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin-bottom:9px;
+  color:var(--text);
+  transition:all .2s;
+}
+.goal-card:hover{border-color:rgba(124,58,237,.4)}
+.goal-card.selected{background:rgba(124,58,237,.12)}
+.goal-icon{font-size:24px;flex-shrink:0}
+.goal-label{font-weight:800;font-size:14px}
+.goal-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.goal-check{font-size:18px;margin-left:auto;opacity:0;transition:opacity .2s;color:var(--accent)}
+.goal-card.selected .goal-check{opacity:1}
+
+.ob-btn-row{display:flex;gap:10px;margin-top:8px}
+
+/* ═══════════════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════════════ */
+#main{background:var(--bg);z-index:1}
+.main-header{
+  padding:14px 18px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  position:relative;
+  z-index:2;
+}
+.header-logo{display:flex;align-items:center;gap:8px}
+.logo-emoji{font-size:22px}
+.logo-text{
+  font-size:18px;font-weight:900;
+  background:linear-gradient(135deg,#c4b5fd,#93c5fd);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header-right{display:flex;gap:8px;align-items:center}
+
+.tab-content{
+  flex:1;
+  overflow-y:auto;
+  padding:0 0 90px;
+  position:relative;
+  z-index:1;
+}
+.tab-pane{display:none;padding:14px 18px 0;animation:fadeUp .3s ease}
+.tab-pane.active{display:block}
+
+/* ═══════════════════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════════════════ */
+.bottom-nav{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  background:rgba(8,8,18,.96);
+  backdrop-filter:blur(24px);
+  border-top:1px solid var(--border);
+  display:flex;
+  padding:10px 0 max(16px,env(safe-area-inset-bottom));
+  z-index:50;
+  flex-shrink:0;
+}
+.nav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  cursor:pointer;
+  color:var(--muted);
+  transition:color .2s;
+  padding:2px 0;
+  border:none;
+  background:none;
+}
+.nav-item.active{color:var(--accent)}
+.nav-icon{font-size:21px;transition:filter .2s}
+.nav-item.active .nav-icon{filter:drop-shadow(0 0 6px rgba(124,58,237,.8))}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.3px}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:0}
+.nav-item.active .nav-dot{opacity:1}
+
+/* ═══════════════════════════════════════════════════
+   PILL BADGES
+═══════════════════════════════════════════════════ */
+.streak-pill{
+  display:flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,rgba(251,146,60,.2),rgba(239,68,68,.15));
+  border:1px solid rgba(251,146,60,.35);
+  border-radius:20px;padding:6px 11px;
+  font-size:13px;font-weight:800;color:#fb923c;
+  white-space:nowrap;
+}
+.xp-pill{
+  display:flex;align-items:center;gap:5px;
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(99,102,241,.15));
+  border:1px solid rgba(124,58,237,.35);
+  border-radius:20px;padding:6px 11px;
+  font-size:13px;font-weight:800;color:#a78bfa;
+  white-space:nowrap;
+}
+.donate-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--grad-amber);
+  border:none;border-radius:20px;
+  padding:7px 12px;cursor:pointer;
+  color:#fff;font-size:13px;font-weight:800;
+  box-shadow:0 3px 12px rgba(239,68,68,.35);
+  transition:transform .15s;
+}
+.donate-btn:active{transform:scale(.96)}
+.icon-btn{
+  width:34px;height:34px;border-radius:50%;
+  background:none;border:1px solid var(--border);
+  cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;color:var(--text);
+}
+.icon-btn:hover{background:var(--card2)}
+
+/* ═══════════════════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════════════════ */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:15px;
+  margin-bottom:12px;
+}
+.card2{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:13px 14px;
+  margin-bottom:8px;
+}
+.section-head{
+  font-size:11px;font-weight:800;
+  color:var(--muted);letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-bottom:10px;margin-top:4px;
+}
+.label{
+  font-size:11px;font-weight:800;
+  color:var(--muted);letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+.subject-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  border-radius:8px;padding:3px 10px;
+  font-size:12px;font-weight:700;
+  margin-bottom:9px;
+}
+
+/* Buttons */
+.btn{
+  width:100%;padding:15px;
+  border:none;border-radius:14px;
+  color:#fff;font-size:15px;font-weight:800;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
+  transition:transform .15s,box-shadow .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-main{background:var(--grad-main);box-shadow:0 6px 20px rgba(124,58,237,.35)}
+.btn-blue{background:var(--grad-blue)}
+.btn-green{background:var(--grad-green)}
+.btn-amber{background:var(--grad-amber)}
+.btn-islamic{background:var(--grad-islamic)}
+.btn-pink{background:var(--grad-pink)}
+.btn-disabled{background:#2a2a4a;color:var(--muted);cursor:not-allowed;box-shadow:none}
+.btn-outline{
+  width:100%;padding:12px;
+  border-radius:13px;
+  background:transparent;
+  font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.btn-sm{
+  padding:8px 14px;
+  border-radius:10px;
+  border:none;
+  font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .15s;
+}
+.btn-sm:active{transform:scale(.96)}
+.btn-row{display:flex;gap:8px;margin-bottom:8px}
+
+/* Inputs */
+.input-field{
+  width:100%;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 13px;
+  color:var(--text);
+  font-size:14px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.input-field:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(124,58,237,.25)}
+textarea.input-field{resize:vertical;min-height:80px}
+.input-field::placeholder{color:var(--muted)}
+select.input-field{cursor:pointer;appearance:none}
+
+/* Toggle switch */
+.toggle-wrap{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  margin-bottom:10px;
+}
+.toggle-label{font-size:13px;font-weight:700}
+.toggle-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{
+  width:46px;height:26px;
+  border-radius:13px;
+  background:rgba(255,255,255,.1);
+  border:none;cursor:pointer;
+  position:relative;transition:background .3s;
+  flex-shrink:0;
+}
+.toggle.on{background:var(--accent)}
+.toggle::after{
+  content:'';
+  position:absolute;
+  top:3px;left:3px;
+  width:20px;height:20px;
+  border-radius:50%;
+  background:#fff;
+  transition:left .3s;
+  box-shadow:0 2px 4px rgba(0,0,0,.3);
+}
+.toggle.on::after{left:23px}
+
+/* Progress bar */
+.progress-wrap{margin-bottom:8px}
+.progress-bar{
+  height:8px;
+  background:rgba(255,255,255,.07);
+  border-radius:4px;overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  border-radius:4px;
+  background:var(--grad-main);
+  transition:width 1s ease;
+}
+
+/* Loading dots */
+.load-dots{display:flex;gap:5px;align-items:center;justify-content:center;padding:14px 0}
+.load-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#60a5fa);
+  animation:bounce 1.2s infinite;
+}
+.load-dot:nth-child(2){animation-delay:.2s}
+.load-dot:nth-child(3){animation-delay:.4s}
+
+/* Highlight sections (AI result) */
+.ai-section{
+  border-radius:13px;
+  padding:13px 14px;
+  margin-bottom:9px;
+}
+.ai-section-title{font-size:12px;font-weight:800;margin-bottom:7px}
+.ai-section-body{font-size:13px;line-height:1.75;white-space:pre-wrap;color:var(--text)}
+
+/* Flashcard */
+.flashcard{
+  border-radius:var(--radius);
+  padding:24px 18px;
+  min-height:140px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  cursor:pointer;
+  margin-bottom:10px;
+  transition:transform .2s;
+  user-select:none;
+}
+.flashcard:active{transform:scale(.98)}
+.fc-subject{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.fc-text{font-size:15px;font-weight:800;line-height:1.6}
+.fc-counter{font-size:11px;margin-top:12px;opacity:.6}
+
+/* Modal overlay */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
+  z-index:200;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  max-width:430px;
+  margin:0 auto;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-sheet{
+  background:var(--card);
+  border-radius:24px 24px 0 0;
+  padding:24px 22px 36px;
+  width:100%;
+  border:1px solid var(--border);
+  border-bottom:none;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
+}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px}
+
+/* Tab switcher */
+.tab-switcher{
+  display:flex;gap:6px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  padding-bottom:2px;
+  margin-bottom:14px;
+}
+.tab-switcher::-webkit-scrollbar{display:none}
+.tab-btn{
+  flex-shrink:0;
+  padding:9px 14px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;font-weight:800;
+  cursor:pointer;
+  transition:all .2s;
+}
+.tab-btn.active{
+  border-color:var(--accent);
+  background:rgba(124,58,237,.15);
+  color:var(--accent);
+}
+
+/* Subject filter chips */
+.filter-row{
+  display:flex;gap:7px;
+  overflow-x:auto;scrollbar-width:none;
+  padding-bottom:6px;margin-bottom:12px;
+}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-chip{
+  flex-shrink:0;
+  padding:7px 14px;border-radius:20px;
+  background:var(--card2);border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.filter-chip.active{
+  background:var(--grad-main);
+  border-color:transparent;
+  color:#fff;
+}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:13px 10px;
+  text-align:center;
+}
+.stat-num{
+  font-size:24px;font-weight:900;
+  background:linear-gradient(135deg,#a78bfa,#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-label{font-size:10px;color:var(--muted);font-weight:700;margin-top:2px}
+
+/* Voice button */
+.voice-btn{
+  width:100%;padding:15px;
+  background:linear-gradient(135deg,#0ea5e9,#6366f1);
+  border:none;border-radius:14px;
+  color:#fff;font-size:15px;font-weight:800;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:8px;
+  transition:transform .15s;
+}
+.voice-btn:active{transform:scale(.97)}
+.voice-btn.listening{
+  background:linear-gradient(135deg,#ef4444,#f43f5e);
+  animation:pulse 1s infinite;
+}
+
+/* Image preview */
+.img-preview{
+  width:100%;max-height:190px;
+  object-fit:cover;
+  border-radius:13px;
+  margin-bottom:12px;
+  display:block;
+}
+
+/* Revision item */
+.rev-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 15px;
+  margin-bottom:9px;
+  animation:fadeUp .3s ease;
+}
+.rev-subject{
+  display:inline-block;
+  border-radius:7px;padding:2px 9px;
+  font-size:11px;font-weight:700;
+  margin-bottom:6px;
+}
+.rev-q{font-size:14px;font-weight:700;margin-bottom:5px;line-height:1.4}
+.rev-a{font-size:12px;color:var(--muted);line-height:1.5}
+.rev-meta{font-size:11px;color:var(--muted);margin-top:5px}
+.rev-actions{display:flex;flex-direction:column;gap:6px;margin-left:10px;flex-shrink:0}
+.rev-star,.rev-del{background:none;border:none;cursor:pointer;font-size:17px;padding:2px}
+
+/* Badge card */
+.badge-card{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;
+  border-radius:13px;
+  border:1px solid var(--border);
+  margin-bottom:8px;
+  background:var(--card2);
+  transition:opacity .2s;
+}
+.badge-card.earned{
+  background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(99,102,241,.08));
+  border-color:rgba(124,58,237,.3);
+}
+.badge-card.locked{opacity:.5}
+.badge-icon-wrap{
+  width:46px;height:46px;
+  border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;flex-shrink:0;
+}
+.badge-name{font-weight:700;font-size:13px}
+.badge-desc{font-size:11px;color:var(--muted);margin-top:1px}
+.badge-xp{font-size:12px;font-weight:800;color:var(--accent);margin-left:auto;flex-shrink:0}
+
+/* Level card */
+.level-card{
+  background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(59,130,246,.1));
+  border:1px solid rgba(124,58,237,.3);
+  border-radius:var(--radius);
+  padding:15px;
+  margin-bottom:12px;
+}
+
+/* Countdown timer */
+.countdown-card{
+  border-radius:20px;
+  padding:17px 15px;
+  margin-bottom:13px;
+  position:relative;
+  overflow:hidden;
+}
+.countdown-card::before{
+  content:'⏰';
+  position:absolute;top:-18px;right:-10px;
+  font-size:80px;opacity:.05;
+}
+.countdown-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px}
+.countdown-unit{
+  border-radius:13px;
+  padding:11px 6px;
+  text-align:center;
+}
+.countdown-num{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+.countdown-label{font-size:9px;color:var(--muted);font-weight:700;margin-top:2px;text-transform:uppercase}
+
+/* Islamic hub */
+.islamic-header{
+  padding:15px 18px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(22,163,74,.15),rgba(13,148,136,.1));
+  border-bottom:1px solid rgba(22,163,74,.2);
+  flex-shrink:0;
+}
+.topic-card{
+  padding:13px 12px;
+  border-radius:15px;
+  cursor:pointer;
+  text-align:left;
+  border:none;
+  width:100%;
+  transition:all .2s;
+  display:flex;align-items:center;gap:11px;
+  color:var(--text);
+  font-family:inherit;
+  margin-bottom:9px;
+}
+.topic-card:active{transform:scale(.98)}
+.topic-icon-wrap{
+  font-size:28px;
+  width:52px;height:52px;
+  border-radius:15px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.topic-name{font-weight:800;font-size:14px;margin-bottom:2px}
+.topic-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.topic-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.topic-tag{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:700}
+
+/* Dua card */
+.dua-card{
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:10px;
+}
+.dua-title{font-weight:800;font-size:14px;margin-bottom:9px}
+.dua-arabic{
+  font-size:20px;font-weight:700;
+  text-align:right;line-height:2;
+  margin-bottom:8px;direction:rtl;
+  font-family:serif;
+}
+.dua-trans{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:4px}
+.dua-meaning{font-size:13px;line-height:1.6;margin-bottom:6px}
+.dua-source{font-size:11px;font-weight:700}
+
+/* Teacher mode */
+.teacher-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 13px;
+  border-radius:13px;
+  margin-bottom:12px;
+}
+
+/* Quick actions grid */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.quick-card{
+  padding:14px 12px;
+  border-radius:17px;
+  border:none;cursor:pointer;
+  text-align:left;color:#fff;
+  font-family:inherit;
+  box-shadow:0 6px 16px rgba(0,0,0,.25);
+  transition:transform .15s;
+}
+.quick-card:active{transform:scale(.97)}
+.quick-emoji{font-size:26px;margin-bottom:7px}
+.quick-title{font-weight:800;font-size:13px;margin-bottom:2px}
+.quick-sub{font-size:11px;opacity:.8}
+
+/* Did you know */
+.fact-card{
+  display:flex;gap:10px;align-items:flex-start;
+  padding:12px 13px;
+  border-radius:12px;
+  background:var(--card2);
+  margin-bottom:8px;
+}
+.fact-icon{font-size:19px;flex-shrink:0}
+.fact-text{font-size:13px;line-height:1.6}
+
+/* Premium card */
+.premium-card{
+  background:linear-gradient(135deg,#4c1d95,#1e3a8a);
+  border:1px solid rgba(167,139,250,.3);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:12px;
+}
+.premium-card h3{color:#fff;font-size:16px;font-weight:900;margin-bottom:4px}
+.premium-card p{font-size:12px;color:rgba(255,255,255,.75);line-height:1.6;margin-bottom:14px}
+.premium-btns{display:flex;gap:8px}
+.prem-btn-monthly{
+  flex:1;padding:11px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:12px;color:#fff;
+  font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;
+}
+.prem-btn-yearly{
+  flex:1;padding:11px;
+  background:#fff;border:none;
+  border-radius:12px;color:#4c1d95;
+  font-family:inherit;font-size:12px;font-weight:900;cursor:pointer;
+}
+.prem-note{font-size:11px;color:rgba(255,255,255,.5);text-align:center;margin-top:10px}
+
+/* Active premium */
+.premium-active{
+  background:linear-gradient(135deg,rgba(16,185,129,.15),rgba(6,182,212,.1));
+  border:1px solid rgba(16,185,129,.3);
+  border-radius:var(--radius);
+  padding:18px;text-align:center;margin-bottom:12px;
+}
+
+/* Profile avatar */
+.profile-avatar{
+  background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(59,130,246,.15));
+  border:1px solid rgba(124,58,237,.35);
+  border-radius:var(--radius);
+  padding:22px;text-align:center;margin-bottom:12px;
+}
+.avatar-emoji{font-size:52px;margin-bottom:8px}
+.avatar-name{font-size:18px;font-weight:900;margin-bottom:2px}
+.avatar-email{font-size:13px;color:var(--muted);margin-bottom:12px}
+.avatar-pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+/* settings list */
+.settings-list{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.settings-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 15px;
+  border-bottom:1px solid var(--border);
+}
+.settings-item:last-child{border-bottom:none}
+.settings-label{font-size:14px;font-weight:600}
+.settings-val{font-size:13px;font-weight:700;color:var(--muted);background:none;border:none;cursor:pointer;font-family:inherit}
+
+/* Language grid */
+.lang-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.lang-btn{
+  padding:8px 13px;border-radius:20px;
+  border:1px solid var(--border);
+  background:transparent;color:var(--muted);
+  font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+.lang-btn.active{
+  background:rgba(124,58,237,.18);
+  border-color:var(--accent);
+  color:var(--accent);
+}
+
+/* Weak topics tracker */
+.tracker-subject{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:10px;
+}
+.tracker-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.tracker-name{font-weight:800;font-size:15px;display:flex;align-items:center;gap:7px}
+.tracker-pct{font-weight:800;font-size:17px}
+.chapter-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.chapter-name{width:90px;font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex-shrink:0}
+.chapter-bar{flex:1;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.chapter-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.chapter-pct{font-size:10px;width:32px;text-align:right;font-weight:700}
+.chapter-trend{font-size:11px;font-weight:700}
+
+/* Leaderboard */
+.lb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 13px;
+  border-radius:13px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  margin-bottom:8px;
+}
+.lb-item.me{
+  background:rgba(124,58,237,.18);
+  border-color:rgba(124,58,237,.4);
+}
+.lb-rank{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;flex-shrink:0;
+}
+.lb-flag{font-size:20px;flex-shrink:0}
+.lb-name{font-weight:700;font-size:13px}
+.lb-streak{font-size:11px;color:var(--muted)}
+.lb-xp{font-weight:800;font-size:14px;color:var(--accent);margin-left:auto}
+
+/* Exam planner */
+.exam-card{
+  border-radius:var(--radius);
+  padding:16px;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.exam-days{text-align:center}
+.exam-days-num{font-size:28px;font-weight:900}
+.exam-days-label{font-size:11px;color:var(--muted);font-weight:700}
+
+/* Subject topic chips */
+.subtopic-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.subtopic-chip{
+  padding:7px 13px;border-radius:20px;
+  font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+  border:none;font-family:inherit;
+}
+
+/* Error/Empty states */
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-emoji{font-size:40px;margin-bottom:9px}
+
+/* Scrollable inner container */
+.scroll-inner{overflow-y:auto;height:100%;padding-bottom:4px}
+.scroll-inner::-webkit-scrollbar{display:none}
+
+/* Voice indicator */
+.voice-indicator{
+  font-size:12px;font-weight:700;
+  padding:6px 12px;border-radius:20px;
+  margin-top:6px;display:inline-block;
+}
+
+/* Grade banner */
+.grade-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 13px;
+  border-radius:15px;
+  margin-bottom:13px;
+}
+.grade-banner-emoji{font-size:26px}
+.grade-banner-name{font-weight:900;font-size:13px}
+.grade-banner-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.grade-change-btn{
+  margin-left:auto;
+  border-radius:9px;padding:6px 10px;
+  border:none;cursor:pointer;
+  font-size:11px;font-weight:700;
+  font-family:inherit;
+}
+
+/* ═══ FLOATING DONATE BUTTON ════════════════════════════════ */
+#float-donate {
+  position: fixed;
+  bottom: 100px;
+  right: 12px;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  animation: float-bob 3s ease-in-out infinite;
+  max-width: 430px;
+}
+@keyframes float-bob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+#float-donate-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border: none;
+  cursor: pointer;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 24px rgba(239,68,68,.5), 0 0 0 4px rgba(245,158,11,.2);
+  transition: transform .2s, box-shadow .2s;
+  color: white;
+}
+#float-donate-btn:hover, #float-donate-btn:active {
+  transform: scale(1.12);
+  box-shadow: 0 8px 32px rgba(239,68,68,.7), 0 0 0 6px rgba(245,158,11,.3);
+}
+#float-donate-label {
+  font-size: 10px;
+  font-weight: 800;
+  color: #fbbf24;
+  letter-spacing: .5px;
+  text-shadow: 0 1px 4px rgba(0,0,0,.6);
+  background: rgba(0,0,0,.4);
+  padding: 2px 7px;
+  border-radius: 8px;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ☕ FLOATING DONATE BUTTON — always visible -->
+<div id="float-donate" onclick="openModal('donate-modal')">
+  <button id="float-donate-btn" aria-label="Donate">☕</button>
+  <div id="float-donate-label">DONATE</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SPLASH
+═══════════════════════════════════════════════════ -->
+<div id="splash" class="screen active">
+  <div style="text-align:center;animation:fadeUp .8s ease">
+    <div class="splash-logo">📸</div>
+    <div class="splash-title">StudySnap AI</div>
+    <div class="splash-tag">SNAP · SOLVE · UNDERSTAND</div>
+  </div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+  <div class="splash-loading">LOADING AI TUTOR...</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     ONBOARDING
+═══════════════════════════════════════════════════ -->
+<div id="onboarding" class="screen">
+  <div class="ob-progress">
+    <div class="ob-prog-bar" id="ob-p0"></div>
+    <div class="ob-prog-bar" id="ob-p1"></div>
+    <div class="ob-prog-bar" id="ob-p2"></div>
+  </div>
+
+  <!-- Step 0: Grade -->
+  <div class="ob-step active" id="ob-step-0">
+    <div style="overflow-y:auto;padding-bottom:20px">
+      <div class="ob-icon">📚</div>
+      <div class="ob-title">What grade are you in?</div>
+      <div class="ob-sub">StudySnap AI will personalise questions,<br>challenges and explanations for your level.</div>
+      <div id="grade-list"></div>
+      <button class="btn btn-disabled" id="ob-next-0" onclick="obNext(0)" style="margin-top:8px">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 1: Name -->
+  <div class="ob-step" id="ob-step-1">
+    <div class="ob-icon">👋</div>
+    <div class="ob-title">What's your name?</div>
+    <div class="ob-sub">So your AI tutor can greet you personally!</div>
+    <div class="name-input-wrap">
+      <input class="name-input" id="ob-name" type="text" placeholder="Enter your name..." oninput="updateNameStep()">
+    </div>
+    <div class="name-quick" id="name-chips"></div>
+    <div class="ob-btn-row">
+      <button class="btn btn-outline" style="flex:.4;border:1px solid var(--border);color:var(--muted)" onclick="obBack(1)">← Back</button>
+      <button class="btn btn-disabled" id="ob-next-1" onclick="obNext(1)" style="flex:1">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Goal -->
+  <div class="ob-step" id="ob-step-2">
+    <div style="overflow-y:auto;padding-bottom:20px">
+      <div class="ob-icon">🎯</div>
+      <div class="ob-title" id="ob-goal-title">What's your main goal?</div>
+      <div class="ob-sub">Your AI tutor will focus on what matters most to you.</div>
+      <div id="goal-list"></div>
+      <div class="ob-btn-row">
+        <button class="btn btn-outline" style="flex:.4;border:1px solid var(--border);color:var(--muted)" onclick="obBack(2)">← Back</button>
+        <button class="btn btn-disabled" id="ob-next-2" onclick="finishOnboarding()" style="flex:1">🚀 Start Learning!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN APP
+═══════════════════════════════════════════════════ -->
+<div id="main" class="screen">
+  <!-- Header -->
+  <div class="main-header">
+    <div class="header-logo">
+      <span class="logo-emoji">📸</span>
+      <span class="logo-text">StudySnap AI</span>
+    </div>
+    <div class="header-right">
+      <div class="streak-pill" id="header-streak">🔥 7</div>
+      <button class="icon-btn" onclick="toggleDark()" id="dark-btn">☀️</button>
+    </div>
+  </div>
+
+  <!-- Tab content -->
+  <div class="tab-content">
+
+    <!-- ── HOME ── -->
+    <div class="tab-pane active" id="tab-home">
+      <!-- Grade banner -->
+      <div class="grade-banner" id="grade-banner" style="display:none"></div>
+
+      <!-- Level / XP -->
+      <div class="level-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <div style="font-size:12px;color:var(--muted);font-weight:700" id="level-label">LEVEL 2</div>
+            <div style="font-weight:800;font-size:16px" id="level-name">🧩 Problem Solver</div>
+          </div>
+          <div class="xp-pill" id="xp-pill">⚡ 185 XP</div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="xp-bar" style="width:45%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px">
+          <span id="xp-curr">185 XP</span><span id="xp-next">300 XP to 🔭 Lv3</span>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-grid">
+        <button class="quick-card" style="background:linear-gradient(135deg,#7c3aed,#9333ea)" onclick="triggerUpload('photo-upload')">
+          <div class="quick-emoji">📷</div>
+          <div class="quick-title">Snap Photo</div>
+          <div class="quick-sub">Auto-detect question</div>
+        </button>
+        <button class="quick-card" style="background:var(--grad-blue)" onclick="switchTab('solve');setMode('check')">
+          <div class="quick-emoji">✅</div>
+          <div class="quick-title">Check Answer</div>
+          <div class="quick-sub">Find my mistakes</div>
+        </button>
+        <button class="quick-card" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4)" onclick="switchTab('textbook')">
+          <div class="quick-emoji">📖</div>
+          <div class="quick-title">Textbook Scan</div>
+          <div class="quick-sub">Summarise + flashcards</div>
+        </button>
+        <button class="quick-card" style="background:var(--grad-islamic)" onclick="switchTab('islamic')">
+          <div class="quick-emoji">🕌</div>
+          <div class="quick-title">Islamic Studies</div>
+          <div class="quick-sub">Quran, Fiqh & more</div>
+        </button>
+      </div>
+
+      <!-- Daily Challenge -->
+      <div class="section-head">🎯 TODAY'S CHALLENGE</div>
+      <div id="challenge-card" style="border-radius:18px;padding:15px;margin-bottom:12px;border:1px solid rgba(245,158,11,.3);background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.08))"></div>
+
+      <!-- Performance snapshot -->
+      <div class="section-head">📊 PERFORMANCE SNAPSHOT</div>
+      <div class="card" id="perf-snap" style="cursor:pointer" onclick="switchTab('tracker')"></div>
+    </div>
+
+    <!-- ── SOLVE ── -->
+    <div class="tab-pane" id="tab-solve">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+        <div style="font-weight:900;font-size:17px;flex:1">🤖 AI Solver</div>
+        <div class="streak-pill" id="solve-streak">🔥7</div>
+      </div>
+
+      <!-- Mode tabs -->
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="mode-solve-btn" onclick="setMode('solve')">✨ Solve</button>
+        <button class="tab-btn" id="mode-check-btn" onclick="setMode('check')">✅ Check Answer</button>
+      </div>
+
+      <!-- Teacher banner -->
+      <div id="teacher-banner" class="teacher-banner" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3)">
+        <span style="font-size:22px">👩‍🏫</span>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:13px;color:var(--red)">Teacher Mode Active</div>
+          <div style="font-size:11px;color:var(--muted)" id="teacher-status-text">0/5 solves used</div>
+        </div>
+      </div>
+
+      <!-- Anti-cheat toggle -->
+      <div class="toggle-wrap">
+        <div>
+          <div class="toggle-label">🔒 Anti-Cheat Mode</div>
+          <div class="toggle-sub">Hides final answer, shows hints only</div>
+        </div>
+        <button class="toggle" id="anticheat-toggle" onclick="toggleAntiCheat()"></button>
+      </div>
+
+      <!-- Image preview -->
+      <img id="uploaded-preview" class="img-preview" style="display:none" alt="uploaded">
+
+      <!-- Question input -->
+      <div class="card">
+        <div class="label">📝 Question</div>
+        <div id="subject-tag-display"></div>
+        <textarea class="input-field" id="question-input" placeholder="Enter your question... or tap 🎙️ to speak" rows="3" oninput="autoDetectSubject()"></textarea>
+
+        <!-- Voice input buttons -->
+        <div class="btn-row" style="margin-top:8px">
+          <button class="btn-sm" id="voice-input-btn" style="flex:1;background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;border:none" onclick="toggleVoiceInput()">
+            🎙️ Speak Question
+          </button>
+          <button class="btn-sm" style="flex:1;background:rgba(16,185,129,.15);color:var(--green);border:1px solid rgba(16,185,129,.25)" onclick="triggerUpload('hw-upload')">
+            ✍️ Handwriting
+          </button>
+        </div>
+        <div id="voice-status" style="display:none" class="voice-indicator"></div>
+
+        <!-- Student answer (check mode) -->
+        <div id="student-answer-wrap" style="display:none;margin-top:10px">
+          <div class="label">✏️ Your Answer</div>
+          <textarea class="input-field" id="student-answer" placeholder="Write your full working and answer here..." rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Settings card -->
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <div style="flex:1">
+            <div class="label">🌍 Language</div>
+            <select class="input-field" id="lang-select" onchange="updateLang()">
+              <option value="en">🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ்</option>
+              <option value="ja">🇯🇵 日本語</option>
+              <option value="hi">🇮🇳 हिंदी</option>
+              <option value="ar">🇸🇦 العربية</option>
+            </select>
+          </div>
+          <div style="flex:1">
+            <div class="label">📚 Subject</div>
+            <select class="input-field" id="subject-select">
+              <option>Math</option><option>Science</option><option>English</option>
+              <option>History</option><option>Physics</option><option>Chemistry</option>
+              <option>Biology</option><option>Business</option><option>Economics</option>
+              <option>Geography</option><option>Islamic Studies</option><option>Quran</option>
+              <option>Arabic</option><option>Fiqh</option><option>Hadith</option>
+              <option>Aqeedah</option><option>Seerah</option><option>Tajweed</option>
+            </select>
+          </div>
+        </div>
+        <div class="label">🧠 Explanation Mode</div>
+        <div class="tab-switcher" style="margin-bottom:10px">
+          <button class="tab-btn active" id="mode-simple" onclick="setExplainMode('simple')">🟢 Simple</button>
+          <button class="tab-btn" id="mode-exam" onclick="setExplainMode('exam')">🔵 Exam</button>
+          <button class="tab-btn" id="mode-detailed" onclick="setExplainMode('detailed')">🟣 Deep</button>
+        </div>
+        <div class="label">🎯 AI Difficulty</div>
+        <div class="tab-switcher">
+          <button class="tab-btn" id="diff-easy" onclick="setDifficulty('easy')">🟢 Easy</button>
+          <button class="tab-btn" id="diff-medium" onclick="setDifficulty('medium')">🟡 Medium</button>
+          <button class="tab-btn" id="diff-hard" onclick="setDifficulty('hard')">🔴 Hard</button>
+          <button class="tab-btn active" id="diff-auto" onclick="setDifficulty('auto')">🤖 Auto</button>
+        </div>
+        <div id="diff-desc" style="font-size:11px;color:var(--accent);margin-top:5px;font-weight:700">🤖 Auto — AI adjusts to your accuracy</div>
+      </div>
+
+      <button class="btn btn-disabled" id="solve-btn" onclick="handleSolve()">✨ Solve &amp; Explain</button>
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn-sm" style="flex:1;background:rgba(124,58,237,.18);color:var(--accent);border:1px solid rgba(124,58,237,.3)" onclick="triggerUpload('photo-upload')">📷 Upload Photo</button>
+        <button class="btn-sm" style="flex:1;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2)" onclick="triggerUpload('hw-upload')">✍️ Handwriting</button>
+      </div>
+
+      <!-- Processing -->
+      <div id="solve-loading" style="display:none" class="card animate-pulse" style="text-align:center;margin-top:14px">
+        <div style="font-size:30px;text-align:center;margin-bottom:6px">🧠</div>
+        <div style="font-weight:800;color:var(--accent);text-align:center">AI is thinking...</div>
+        <div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div>
+      </div>
+
+      <!-- Result -->
+      <div id="solve-result" style="display:none;margin-top:14px;animation:fadeUp .4s ease"></div>
+    </div>
+
+    <!-- ── ISLAMIC ── -->
+    <div class="tab-pane" id="tab-islamic" style="padding:0">
+      <div class="islamic-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:26px">🕌</span>
+          <div>
+            <div style="font-weight:900;font-size:18px;color:var(--islamic)">Islamic Studies</div>
+            <div style="font-size:11px;color:var(--muted)">بسم الله الرحمن الرحيم</div>
+          </div>
+        </div>
+        <div class="streak-pill" style="background:rgba(22,163,74,.2);border-color:rgba(22,163,74,.35);color:var(--islamic);font-size:12px">📖 Hub</div>
+      </div>
+      <div style="padding:12px 18px 0">
+        <div class="tab-switcher">
+          <button class="tab-btn active" onclick="islamicTab('hub')">🕌 Hub</button>
+          <button class="tab-btn" onclick="islamicTab('topics')">📚 Subjects</button>
+          <button class="tab-btn" onclick="islamicTab('flashcards')">🃏 Cards</button>
+          <button class="tab-btn" onclick="islamicTab('duas')">🤲 Duas</button>
+        </div>
+        <div id="islamic-content"></div>
+      </div>
+    </div>
+
+    <!-- ── TRACKER ── -->
+    <div class="tab-pane" id="tab-tracker">
+      <div style="font-weight:900;font-size:17px;margin-bottom:12px">📊 Weak Topic Tracker</div>
+      <div class="stats-grid" id="tracker-stats"></div>
+      <div id="tracker-subjects"></div>
+    </div>
+
+    <!-- ── PLANNER ── -->
+    <div class="tab-pane" id="tab-planner">
+      <div style="font-weight:900;font-size:17px;margin-bottom:12px">📅 Exam Planner & Countdown</div>
+      <!-- Countdowns -->
+      <div id="countdown-list"></div>
+      <!-- Add exam -->
+      <div class="section-head">➕ ADD EXAM COUNTDOWN</div>
+      <div class="card">
+        <input class="input-field" id="exam-name-input" placeholder="Exam name (e.g. Math Final)" style="margin-bottom:8px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select class="input-field" id="exam-subj-input" style="flex:1">
+            <option>Math</option><option>Science</option><option>Physics</option><option>Chemistry</option>
+            <option>Biology</option><option>English</option><option>History</option><option>Economics</option>
+            <option>Islamic Studies</option><option>Quran</option><option>Fiqh</option><option>Seerah</option>
+          </select>
+          <input type="date" class="input-field" id="exam-date-input" style="flex:1">
+        </div>
+        <button class="btn btn-main" onclick="addExam()">⏱️ Add Countdown</button>
+      </div>
+      <!-- Study Plan -->
+      <div class="section-head" style="margin-top:4px">🧠 AI STUDY PLAN</div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select class="input-field" id="plan-subj" style="flex:1">
+            <option>Math</option><option>Science</option><option>Physics</option><option>English</option>
+            <option>Islamic Studies</option><option>Fiqh</option><option>Quran</option>
+          </select>
+          <input type="date" class="input-field" id="plan-date" style="flex:1">
+        </div>
+        <button class="btn btn-main" onclick="generatePlan()" id="plan-btn">🗓️ Generate AI Plan</button>
+      </div>
+      <div id="plan-result" style="margin-top:8px"></div>
+      <!-- Leaderboard -->
+      <div class="section-head" style="margin-top:8px">🏆 STUDY LEADERBOARD</div>
+      <div id="leaderboard"></div>
+    </div>
+
+    <!-- ── TEXTBOOK ── -->
+    <div class="tab-pane" id="tab-textbook">
+      <div style="font-weight:900;font-size:17px;margin-bottom:12px">📚 Textbook Scanner</div>
+      <!-- Flashcards -->
+      <div class="section-head">🃏 FLASHCARDS</div>
+      <div id="flashcard-wrap"></div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <button class="btn-outline" style="flex:1;border:1px solid var(--border);color:var(--muted)" onclick="prevFlashcard()">← Prev</button>
+        <button class="btn-outline" style="flex:1;border:1px solid var(--accent);color:var(--accent)" onclick="nextFlashcard()">Next →</button>
+      </div>
+      <!-- Scanner -->
+      <div class="section-head">📸 SCAN TEXTBOOK PAGE</div>
+      <div class="card" style="text-align:center;border:2px dashed var(--border);cursor:pointer;padding:28px" onclick="triggerUpload('textbook-upload')">
+        <div style="font-size:36px;margin-bottom:8px">📷</div>
+        <div style="font-weight:700">Tap to upload textbook page</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">AI will summarise + extract formulas + create flashcards</div>
+      </div>
+      <img id="textbook-preview" class="img-preview" style="display:none" alt="textbook">
+      <button class="btn btn-main" onclick="scanTextbook()" id="scan-btn">🔬 Scan &amp; Analyse</button>
+      <div id="textbook-loading" style="display:none" class="card animate-pulse" style="text-align:center;margin-top:12px">
+        <div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div>
+        <div style="font-weight:700;color:#0ea5e9;text-align:center">Reading your textbook...</div>
+      </div>
+      <div id="textbook-result" style="margin-top:12px"></div>
+    </div>
+
+    <!-- ── TEACHER ── -->
+    <div class="tab-pane" id="tab-teacher">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-weight:900;font-size:17px">👩‍🏫 Teacher / Parent Mode</div>
+        <div class="streak-pill" id="teacher-mode-badge" style="background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.35);color:var(--green)">✅ OFF</div>
+      </div>
+      <div id="teacher-content"></div>
+    </div>
+
+    <!-- ── REVISION ── -->
+    <div class="tab-pane" id="tab-revision">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-weight:900;font-size:17px">📂 Revision Folder</div>
+        <button class="btn-sm" style="background:var(--grad-main);color:#fff;border:none">📄 PDF</button>
+      </div>
+      <input class="input-field" id="rev-search" placeholder="🔍 Search saved answers..." style="margin-bottom:10px" oninput="filterRevision()">
+      <div class="filter-row" id="rev-filters"></div>
+      <div id="revision-list"></div>
+    </div>
+
+    <!-- ── PROFILE ── -->
+    <div class="tab-pane" id="tab-profile">
+      <div class="profile-avatar">
+        <div class="avatar-emoji" id="profile-emoji">🧩</div>
+        <div class="avatar-name" id="profile-name">Student</div>
+        <div class="avatar-email">student@studysnap.ai</div>
+        <div class="avatar-pills" id="profile-pills"></div>
+      </div>
+      <div class="stats-grid" id="profile-stats"></div>
+      <div class="section-head">🏆 ACHIEVEMENTS</div>
+      <div id="badge-list"></div>
+      <div class="section-head">🌍 LANGUAGE</div>
+      <div class="lang-grid" id="lang-grid"></div>
+      <div class="section-head">⚙️ SETTINGS</div>
+      <div class="settings-list">
+        <div class="settings-item"><span class="settings-label">🌙 Dark Mode</span><button class="settings-val" onclick="toggleDark()" id="dark-setting">On</button></div>
+        <div class="settings-item"><span class="settings-label">🔒 Anti-Cheat</span><button class="settings-val" onclick="toggleAntiCheat()" id="anticheat-setting">Off</button></div>
+        <div class="settings-item"><span class="settings-label">🎓 Change Grade</span><button class="settings-val" onclick="goToOnboarding()" style="color:var(--accent)">Change →</button></div>
+        <div class="settings-item"><span class="settings-label">🔔 Notifications</span><button class="settings-val">On</button></div>
+      </div>
+      <div id="premium-section"></div>
+    </div>
+
+  </div><!-- end tab-content -->
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+      <div class="nav-icon">🏠</div><div class="nav-label">Home</div><div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" onclick="switchTab('solve')" id="nav-solve">
+      <div class="nav-icon">✨</div><div class="nav-label">Solve</div><div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" onclick="switchTab('islamic')" id="nav-islamic">
+      <div class="nav-icon">🕌</div><div class="nav-label">Islamic</div><div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" onclick="switchTab('planner')" id="nav-planner">
+      <div class="nav-icon">⏱️</div><div class="nav-label">Timer</div><div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" onclick="switchTab('teacher')" id="nav-teacher">
+      <div class="nav-icon">👩‍🏫</div><div class="nav-label">Teacher</div><div class="nav-dot"></div>
+    </button>
+    <button class="nav-item" onclick="switchTab('profile')" id="nav-profile">
+      <div class="nav-icon">👤</div><div class="nav-label">Profile</div><div class="nav-dot"></div>
+    </button>
+  </div>
+</div><!-- end #main -->
+
+<!-- ═══════════════════════════════════════════════════
+     HIDDEN FILE INPUTS
+═══════════════════════════════════════════════════ -->
+<input type="file" id="photo-upload" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,'solve')">
+<input type="file" id="hw-upload" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,'hw')">
+<input type="file" id="textbook-upload" accept="image/*" style="display:none" onchange="handlePhotoUpload(event,'textbook')">
+
+<!-- ═══════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════ -->
+<!-- Donate Modal -->
+<div class="modal-overlay" id="donate-modal" onclick="closeModalOutside(event,'donate-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="donate-content"></div>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════
+const STATE = {
+  screen:'splash',
+  gradeKey:null, gradeProfile:null, studentName:'Student', studyGoal:'',
+  obStep:0, obGrade:null, obName:'', obGoal:'',
+  activeTab:'home',
+  darkMode:true,
+  lang:'en',
+  isPremium:false,
+  antiCheat:false,
+  teacherMode:false, teacherPin:'1234', teacherPinSet:false,
+  teacherSettings:{hideAnswers:true, maxSolves:5, allowedSubjects:['Math','Science','English','Islamic Studies']},
+  xp:185, streak:7, totalSolved:23, solveCount:0,
+  explainMode:'simple',
+  difficulty:'auto',
+  solveMode:'solve',
+  isProcessing:false,
+  isListening:false,
+  voiceSpeed:1,
+  currentQuestion:'',
+  currentSubject:'Math',
+  aiResult:null,
+  savedToRevision:false,
+  uploadedImage:null,
+  hwImage:null,
+  textbookImage:null,
+  flashcardIndex:0,
+  flashcardFlipped:false,
+  islamicFlashIndex:0,
+  islamicFlashFlipped:false,
+  islamicSubTab:'hub',
+  islamicSelectedTopic:null,
+  donateDone:false,
+  donateAmount:'3',
+  revisionItems:[
+    {id:1,subject:'Math',question:'Solve: 2x² + 5x - 3 = 0',answer:'x = 0.5 or x = -3',important:true,date:'Feb 28'},
+    {id:2,subject:'Physics',question:"Newton's Second Law?",answer:'F = ma',important:false,date:'Feb 27'},
+    {id:3,subject:'English',question:'Identify the metaphor',answer:"Direct comparison without like/as",important:true,date:'Feb 26'},
+    {id:4,subject:'Islamic Studies',question:'What are the 5 Pillars of Islam?',answer:'Shahada, Salah, Zakah, Sawm, Hajj',important:true,date:'Feb 25'},
+  ],
+  revSearch:'', revSubjectFilter:'All',
+  countdownExams:[
+    {id:1,name:'Math Final',date:'2026-04-28',subject:'Math',color:'#6366f1'},
+    {id:2,name:'Physics Test',date:'2026-04-22',subject:'Physics',color:'#3b82f6'},
+  ],
+  countdownInterval:null,
+  challengeAnswer:'', challengeDone:false,
+  planResult:null,
+};
+
+// ── DATA ─────────────────────────────────────────────────────────
+const SUBJECT_COLORS={Math:'#6366f1',Science:'#8b5cf6',English:'#ec4899',History:'#f59e0b',Business:'#10b981',Chemistry:'#06b6d4',Physics:'#3b82f6',Biology:'#22c55e',Economics:'#f97316',Geography:'#84cc16','Islamic Studies':'#16a34a','Quran':'#15803d','Arabic':'#0d9488','Fiqh':'#047857','Hadith':'#0f766e','Aqeedah':'#065f46','Seerah':'#14532d','Tajweed':'#166534'};
+
+const GRADE_PROFILES={
+  'Grade 1-3':{range:'1-3',emoji:'🌱',level:'Primary',ages:'6-9',color:'#10b981',dailyGoal:3,xpMult:1,tone:'fun and simple, like a playful friend'},
+  'Grade 4-6':{range:'4-6',emoji:'📗',level:'Upper Primary',ages:'9-12',color:'#06b6d4',dailyGoal:5,xpMult:1.2,tone:'friendly and encouraging, with simple examples'},
+  'Grade 7-9':{range:'7-9',emoji:'📘',level:'Middle School',ages:'12-15',color:'#6366f1',dailyGoal:7,xpMult:1.5,tone:'clear and motivational, like a cool tutor'},
+  'Grade 10-12':{range:'10-12',emoji:'📙',level:'High School',ages:'15-18',color:'#f59e0b',dailyGoal:10,xpMult:2,tone:'academic and exam-focused, with depth'},
+  'University':{range:'Uni',emoji:'🎓',level:'University',ages:'18+',color:'#8b5cf6',dailyGoal:10,xpMult:3,tone:'university-level with technical precision and depth'},
+};
+
+const GRADE_CHALLENGES={
+  'Grade 1-3':[{subject:'Math',xp:15,question:"What is 5 + 3?",hint:"Count on your fingers!"},{subject:'Islamic Studies',xp:15,question:"Name the 5 Pillars of Islam.",hint:"Start with Shahada..."}],
+  'Grade 4-6':[{subject:'Math',xp:25,question:"What is 24 ÷ 6?",hint:"Think of equal groups"},{subject:'Tajweed',xp:20,question:"Name the 4 Noon Sakinah rules.",hint:"Izhar, Idgham, Iqlab, Ikhfa"}],
+  'Grade 7-9':[{subject:'Math',xp:40,question:"Solve: 3x + 7 = 22",hint:"Subtract 7 from both sides"},{subject:'Fiqh',xp:40,question:"List the conditions for Salah to be valid.",hint:"Taharah, Wudu, facing Qiblah..."}],
+  'Grade 10-12':[{subject:'Math',xp:60,question:"Differentiate: f(x) = 3x² + 5x − 2",hint:"Use the power rule"},{subject:'Aqeedah',xp:60,question:"Explain the three categories of Tawheed.",hint:"Rububiyyah, Uluhiyyah, Asma wa Sifat"}],
+  'University':[{subject:'Math',xp:80,question:"Prove that √2 is irrational.",hint:"Proof by contradiction"},{subject:'Fiqh',xp:80,question:"Explain the Maqasid al-Shariah and their role in Islamic jurisprudence."}],
+};
+
+const DEFAULT_CHALLENGES=[
+  {subject:'Math',xp:50,question:"A train travels 120km in 2 hours. What is its average speed?",hint:"Speed = Distance ÷ Time"},
+  {subject:'Science',xp:80,question:"Explain why hot air rises using kinetic molecular theory."},
+  {subject:'Islamic Studies',xp:45,question:"What are the 6 Pillars of Iman?",hint:"Belief in Allah, Angels, Books..."},
+  {subject:'Quran',xp:50,question:"What is the meaning and theme of Surah Al-Ikhlas?",hint:"It speaks of Tawheed..."},
+];
+
+const FLASHCARDS=[
+  {front:"What is Newton's 2nd Law?",back:"F = ma\nForce = Mass × Acceleration",subject:'Physics'},
+  {front:'Quadratic Formula',back:'x = (-b ± √(b²-4ac)) / 2a',subject:'Math'},
+  {front:'Photosynthesis equation',back:'6CO₂ + 6H₂O + light → C₆H₁₂O₆ + 6O₂',subject:'Biology'},
+  {front:"What is a metaphor?",back:"Direct comparison without using 'like' or 'as'",subject:'English'},
+  {front:'What are the 5 Pillars of Islam?',back:'1. Shahada\n2. Salah\n3. Zakah\n4. Sawm\n5. Hajj',subject:'Islamic Studies'},
+  {front:'What is Tawheed?',back:'Absolute Oneness of Allah.\n3 categories: Rububiyyah, Uluhiyyah, Asma wa Sifat',subject:'Aqeedah'},
+  {front:'Ikhfa rule in Tajweed',back:'Hiding noon sakinah/tanween before 15 letters\nwith partial Ghunnah (nasalisation)',subject:'Tajweed'},
+  {front:'First word revealed to Prophet ﷺ',back:"'Iqra' — Read/Recite\n(Surah Al-Alaq 96:1) revealed in Cave Hira",subject:'Quran'},
+];
+
+const ISLAMIC_FLASHCARDS=[
+  {front:'5 Pillars of Islam',back:'1. Shahada\n2. Salah (5x daily)\n3. Zakah (2.5%)\n4. Sawm (Ramadan)\n5. Hajj (once, if able)',subject:'Islamic Studies'},
+  {front:'6 Pillars of Iman',back:'1. Belief in Allah\n2. Angels\n3. Divine Books\n4. Prophets\n5. Day of Judgement\n6. Divine Decree (Qadar)',subject:'Aqeedah'},
+  {front:'What is Tajweed?',back:'Rules of correct Quran recitation — ensuring each letter is pronounced from its correct point (Makhraj) with proper characteristics.',subject:'Tajweed'},
+  {front:'Noon Sakinah Rules',back:'1. Izhar — clear pronunciation\n2. Idgham — merging\n3. Iqlab — conversion to meem\n4. Ikhfa — hiding with ghunnah',subject:'Tajweed'},
+  {front:'Meaning of "Islam"',back:"From Arabic 'Salama' — peace, purity, submission.\nIslam = submission to the will of Allah.",subject:'Islamic Studies'},
+  {front:'How many Rakat in each prayer?',back:'Fajr: 2\nDhuhr: 4\nAsr: 4\nMaghrib: 3\nIsha: 4',subject:'Fiqh'},
+  {front:'Who was Khalilullah?',back:"Prophet Ibrahim (AS) — 'Friend of Allah'\nHe rebuilt the Ka'bah with his son Ismail (AS)",subject:'Seerah'},
+  {front:'Meaning of Bismillah',back:"In the name of Allah, the Most Gracious, the Most Merciful.\nEvery surah (except At-Tawbah) begins with it.",subject:'Quran'},
+];
+
+const ISLAMIC_TOPICS={
+  'Quran':{desc:'The Holy Quran — memorisation, meaning, and recitation',chapters:['Al-Fatiha','Al-Baqarah','Surah Yasin','Surah Al-Kahf','Surah Al-Mulk','Juz Amma','Last 10 Surahs'],icon:'📖',color:'#15803d',subtopics:['Memorisation (Hifz)','Tafsir (Meaning)','Rules of Recitation','Story of Revelation','Virtues of Surahs']},
+  'Tajweed':{desc:'Rules of correct Quran recitation',chapters:['Makharij al-Huroof','Noon Sakinah Rules','Meem Sakinah','Madd (Elongation)','Waqf Rules','Ghunnah','Idgham','Ikhfa'],icon:'🎵',color:'#166534',subtopics:['Articulation points','Noon & Meem rules','Elongation rules','Stopping & pausing','Short Surah practice']},
+  'Arabic':{desc:'Classical Arabic — grammar, vocab and reading',chapters:['Arabic Alphabet','Basic Grammar (Nahw)','Morphology (Sarf)','Vocabulary','Reading','Sentence Structure'],icon:'🌙',color:'#0d9488',subtopics:['Ism (Noun)','Fi\'il (Verb)','Harf (Particle)','Masculine & Feminine','Dual & Plural']},
+  'Fiqh':{desc:'Islamic jurisprudence — worship and daily life',chapters:['Taharah (Purification)','Salah (Prayer)','Zakah','Sawm (Fasting)','Hajj & Umrah','Halal & Haram','Marriage & Family'],icon:'⚖️',color:'#047857',subtopics:['Conditions of Salah','How to make Wudu','Rules of fasting','Zakat calculation','Islamic finance']},
+  'Hadith':{desc:"Sayings and actions of Prophet Muhammad ﷺ",chapters:['40 Hadith Nawawi','Hadith of Jibril','Six Major Collections','Chain of Narration (Isnad)','Hadith Classification'],icon:'📜',color:'#0f766e',subtopics:['Sahih Hadith','Hasan Hadith','Isnad analysis','Bukhari & Muslim','Context & Application']},
+  'Aqeedah':{desc:'Islamic creed and beliefs',chapters:['6 Pillars of Iman','Tawheed','99 Names of Allah','Angels','Prophets & Messengers','Day of Judgement','Qadar'],icon:'🕌',color:'#065f46',subtopics:['Tawheed al-Rububiyyah','Tawheed al-Uluhiyyah','Shirk and its types','Signs of Judgement','Life after death']},
+  'Seerah':{desc:"Biography of Prophet Muhammad ﷺ",chapters:['Birth & Early Life','First Revelation','Migration to Madinah','Major Battles','The Farewell Sermon','The Companions'],icon:'⭐',color:'#14532d',subtopics:['Life in Makkah','Life in Madinah','Treaty of Hudaybiyyah','Conquest of Makkah','Final years']},
+  'Islamic Studies':{desc:'General Islamic education — pillars, practices, values',chapters:['5 Pillars of Islam','6 Pillars of Iman','Islamic Calendar','Duas & Prayers','Islamic History','Islamic Ethics'],icon:'🕌',color:'#16a34a',subtopics:['Shahada','Salah conditions','Ramadan & Eid','Zakat calculation','Manners in Islam']},
+};
+
+const DUAS=[
+  {title:'Dua before studying',arabic:'رَبِّ زِدْنِي عِلْمًا',trans:'Rabbi zidni ilma',meaning:'O my Lord! Increase me in knowledge.',source:'Quran 20:114',color:'#15803d'},
+  {title:'Dua for understanding',arabic:'اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا',trans:"Allahumma inni as'aluka ilman nafi'an",meaning:'O Allah, I ask You for beneficial knowledge.',source:'Ibn Majah',color:'#047857'},
+  {title:'Dua before exam',arabic:'اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا',trans:"Allahumma la sahla illa ma ja'altahu sahla",meaning:'O Allah, nothing is easy except what You make easy.',source:'Ibn Hibban',color:'#065f46'},
+  {title:'Dua for clarity',arabic:'رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي',trans:'Rabbi-shrah li sadri wa yassir li amri',meaning:'O Lord, expand my chest and ease my affairs.',source:'Quran 20:25-26',color:'#0d9488'},
+  {title:'Dua when confused',arabic:'حَسْبِيَ اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ',trans:'Hasbiyallahu la ilaha illa huwa',meaning:'Allah is sufficient for me; there is no deity except Him.',source:'Quran 9:129',color:'#0f766e'},
+  {title:'Dua for memory',arabic:'اللَّهُمَّ ارْزُقْنِي فَهْمَ النَّبِيِّينَ',trans:"Allahumma-rzuqni fahm an-nabiyyeen",meaning:'O Allah, grant me the understanding of the Prophets.',source:'Traditional',color:'#16a34a'},
+];
+
+const WEAK_TOPICS={'Islamic Studies':{accuracy:78,chapters:{'5 Pillars':{a:90,t:'up'},'Aqeedah Basics':{a:72,t:'stable'},'Islamic History':{a:65,t:'down'}}},'Quran':{accuracy:74,chapters:{'Memorisation':{a:80,t:'up'},'Tafsir':{a:65,t:'down'},'Revelation':{a:72,t:'stable'}}},'Fiqh':{accuracy:68,chapters:{'Salah':{a:82,t:'up'},'Taharah':{a:75,t:'stable'},'Zakah':{a:55,t:'down'}}},Math:{accuracy:70,chapters:{Algebra:{a:45,t:'down'},Geometry:{a:82,t:'up'},Calculus:{a:61,t:'up'}}},Science:{accuracy:78,chapters:{Physics:{a:72,t:'up'},Chemistry:{a:84,t:'up'},Biology:{a:78,t:'stable'}}},English:{accuracy:85,chapters:{'Essay Writing':{a:79,t:'up'},Grammar:{a:90,t:'stable'},Literature:{a:87,t:'up'}}}};
+
+const BADGES=[
+  {id:1,icon:'🔥',name:'First Solve',desc:'Solved your first question',earned:true,xp:10},
+  {id:2,icon:'⚡',name:'Speed Learner',desc:'5 questions in one day',earned:true,xp:25},
+  {id:3,icon:'🎯',name:'Answer Checker',desc:'Used answer checker 10 times',earned:true,xp:30},
+  {id:4,icon:'🧠',name:'Big Brain',desc:'50 total questions solved',earned:false,xp:50},
+  {id:5,icon:'💎',name:'Diamond Student',desc:'7-day streak',earned:false,xp:75},
+  {id:6,icon:'🏆',name:'Legend',desc:'100 questions solved',earned:false,xp:100},
+  {id:7,icon:'📚',name:'Textbook Master',desc:'Scanned 5 textbook pages',earned:false,xp:40},
+  {id:8,icon:'✍️',name:'Essay Pro',desc:'Improved 3 essays',earned:false,xp:35},
+  {id:9,icon:'🕌',name:'Islamic Scholar',desc:'Solved 10 Islamic questions',earned:false,xp:60},
+];
+
+const LEVELS=[
+  {lvl:1,name:'Curious Learner',icon:'📖',min:0,max:100},
+  {lvl:2,name:'Problem Solver',icon:'🧩',min:100,max:300},
+  {lvl:3,name:'Knowledge Seeker',icon:'🔭',min:300,max:600},
+  {lvl:4,name:'Academic Star',icon:'⭐',min:600,max:1000},
+  {lvl:5,name:'Brain Legend',icon:'🧠',min:1000,max:9999},
+];
+
+// ═══════════════════════════════════════════════════════════════════
+//  INIT & SPLASH
+// ═══════════════════════════════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  STATE.screen=id;
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    if(STATE.gradeKey) startMain();
+    else showScreen('onboarding'), initOnboarding();
+  },2600);
+});
+
+// ═══════════════════════════════════════════════════════════════════
+//  ONBOARDING
+// ═══════════════════════════════════════════════════════════════════
+function initOnboarding(){
+  // Build grade cards
+  const gl=document.getElementById('grade-list');
+  gl.innerHTML='';
+  Object.entries(GRADE_PROFILES).forEach(([key,p])=>{
+    const div=document.createElement('div');
+    div.className='grade-card';
+    div.dataset.grade=key;
+    div.style.borderColor='var(--border)';
+    div.innerHTML=`
+      <div class="grade-card-icon" style="background:${p.color}22;border:1px solid ${p.color}44">
+        <span style="font-size:28px">${p.emoji}</span>
+      </div>
+      <div style="flex:1">
+        <div class="grade-card-name">${key}</div>
+        <div class="grade-card-meta">${p.level} · Ages ${p.ages}</div>
+        <div class="grade-card-tags">
+          <span class="grade-tag" style="background:${p.color}18;color:${p.color}">Math</span>
+          <span class="grade-tag" style="background:${p.color}18;color:${p.color}">Islamic</span>
+          <span class="grade-tag" style="background:${p.color}18;color:${p.color}">Science</span>
+        </div>
+      </div>
+      <div class="grade-check" style="color:${p.color}">✓</div>`;
+    div.onclick=()=>selectGrade(key,p);
+    gl.appendChild(div);
+  });
+  // Build name chips
+  const nc=document.getElementById('name-chips');
+  ['Alex','Sam','Kai','Maya','Leo','Arjun','Sakura','Zoe'].forEach(n=>{
+    const b=document.createElement('button');
+    b.className='name-chip';b.textContent=n;
+    b.onclick=()=>{document.getElementById('ob-name').value=n;updateNameStep();b.parentElement.querySelectorAll('.name-chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')};
+    nc.appendChild(b);
+  });
+  // Build goal list
+  const goals=[
+    {icon:'📝',label:'Pass my exams',sub:'Help me score well and revise smart'},
+    {icon:'🧠',label:'Actually understand',sub:'Explain concepts so they click'},
+    {icon:'⚡',label:'Catch up fast',sub:"I'm behind and need to level up quick"},
+    {icon:'🏆',label:'Get top grades',sub:'Push me hard with advanced content'},
+    {icon:'📖',label:'Just curious',sub:'I love learning new things'},
+  ];
+  const gll=document.getElementById('goal-list');
+  gll.innerHTML='';
+  goals.forEach(g=>{
+    const div=document.createElement('div');
+    div.className='goal-card';
+    div.innerHTML=`<span class="goal-icon">${g.icon}</span><div><div class="goal-label">${g.label}</div><div class="goal-sub">${g.sub}</div></div><div class="goal-check">✓</div>`;
+    div.onclick=()=>{document.querySelectorAll('.goal-card').forEach(x=>x.classList.remove('selected'));div.classList.add('selected');STATE.obGoal=g.label;updateGoalStep()};
+    gll.appendChild(div);
+  });
+  updateObProgress();
+}
+
+function selectGrade(key,p){
+  STATE.obGrade=key;
+  document.querySelectorAll('.grade-card').forEach(c=>{
+    const g=GRADE_PROFILES[c.dataset.grade];
+    c.classList.toggle('selected',c.dataset.grade===key);
+    c.style.borderColor=c.dataset.grade===key?p.color:'var(--border)';
+    c.style.background=c.dataset.grade===key?`${p.color}18`:'transparent';
+    c.style.boxShadow=c.dataset.grade===key?`0 4px 20px ${p.color}33`:'none';
+  });
+  const btn=document.getElementById('ob-next-0');
+  btn.className='btn btn-main';
+  updateObProgress();
+}
+
+function updateNameStep(){
+  const v=document.getElementById('ob-name').value.trim();
+  STATE.obName=v;
+  document.getElementById('ob-next-1').className=v?'btn btn-main':'btn btn-disabled';
+}
+
+function updateGoalStep(){
+  document.getElementById('ob-next-2').className=STATE.obGoal?'btn btn-main':'btn btn-disabled';
+}
+
+function updateObProgress(){
+  [0,1,2].forEach(i=>{
+    document.getElementById(`ob-p${i}`).classList.toggle('done',i<STATE.obStep||(i===0&&STATE.obGrade));
+  });
+}
+
+function obNext(step){
+  if(step===0&&!STATE.obGrade)return;
+  if(step===1&&!STATE.obName.trim())return;
+  const cur=document.getElementById(`ob-step-${step}`);
+  const nxt=document.getElementById(`ob-step-${step+1}`);
+  cur.classList.remove('active');nxt.classList.add('active');
+  STATE.obStep=step+1;
+  if(step===1){
+    document.getElementById('ob-goal-title').textContent=`What's your main goal, ${STATE.obName}?`;
+  }
+  updateObProgress();
+}
+
+function obBack(step){
+  document.getElementById(`ob-step-${step}`).classList.remove('active');
+  document.getElementById(`ob-step-${step-1}`).classList.add('active');
+  STATE.obStep=step-1;
+  updateObProgress();
+}
+
+function finishOnboarding(){
+  if(!STATE.obGoal)return;
+  STATE.gradeKey=STATE.obGrade;
+  STATE.gradeProfile=GRADE_PROFILES[STATE.obGrade];
+  STATE.studentName=STATE.obName||'Student';
+  STATE.studyGoal=STATE.obGoal;
+  startMain();
+}
+
+function goToOnboarding(){
+  showScreen('onboarding');
+  STATE.obStep=0;
+  document.querySelectorAll('.ob-step').forEach((s,i)=>{s.classList.toggle('active',i===0)});
+  initOnboarding();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  MAIN APP INIT
+// ═══════════════════════════════════════════════════════════════════
+function startMain(){
+  showScreen('main');
+  renderAll();
+  startCountdownTimer();
+  renderChallenge();
+  renderPerfSnap();
+  renderFlashcard();
+  renderIslamicContent();
+  renderTracker();
+  renderRevision();
+  renderTeacher();
+  renderPlanner();
+  renderProfile();
+  renderPremium();
+}
+
+function renderAll(){
+  updateHeaderStreak();
+  updateXpDisplay();
+  renderGradeBanner();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════════
+function switchTab(tab){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pane=document.getElementById(`tab-${tab}`);
+  if(pane) pane.classList.add('active');
+  const nav=document.getElementById(`nav-${tab}`);
+  if(nav) nav.classList.add('active');
+  STATE.activeTab=tab;
+  // Refresh dynamic content
+  if(tab==='planner')renderPlanner();
+  if(tab==='revision')renderRevision();
+  if(tab==='profile')renderProfile();
+  if(tab==='islamic')renderIslamicContent();
+  if(tab==='tracker')renderTracker();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DARK MODE
+// ═══════════════════════════════════════════════════════════════════
+function toggleDark(){
+  STATE.darkMode=!STATE.darkMode;
+  document.documentElement.classList.toggle('light-mode',!STATE.darkMode);
+  document.getElementById('dark-btn').textContent=STATE.darkMode?'☀️':'🌙';
+  document.getElementById('dark-setting').textContent=STATE.darkMode?'On':'Off';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  HEADER UPDATES
+// ═══════════════════════════════════════════════════════════════════
+function updateHeaderStreak(){
+  document.getElementById('header-streak').textContent=`🔥 ${STATE.streak}`;
+  document.getElementById('solve-streak').textContent=`🔥${STATE.streak}`;
+}
+
+function updateXpDisplay(){
+  const lvl=LEVELS.find(l=>STATE.xp>=l.min&&STATE.xp<l.max)||LEVELS[LEVELS.length-1];
+  const nxt=LEVELS.find(l=>l.min>STATE.xp)||LEVELS[LEVELS.length-1];
+  const pct=Math.min(100,((STATE.xp-lvl.min)/(nxt.min-lvl.min))*100)||0;
+  document.getElementById('xp-pill').textContent=`⚡ ${STATE.xp} XP`;
+  document.getElementById('level-label').textContent=`LEVEL ${lvl.lvl}`;
+  document.getElementById('level-name').textContent=`${lvl.icon} ${lvl.name}`;
+  document.getElementById('xp-bar').style.width=`${pct}%`;
+  document.getElementById('xp-curr').textContent=`${STATE.xp} XP`;
+  document.getElementById('xp-next').textContent=`${nxt.min} XP to ${nxt.icon} Lv${nxt.lvl}`;
+}
+
+function addXp(amount){
+  STATE.xp+=amount;
+  updateXpDisplay();
+  renderProfile();
+}
+
+function renderGradeBanner(){
+  const el=document.getElementById('grade-banner');
+  if(!STATE.gradeProfile){el.style.display='none';return;}
+  const p=STATE.gradeProfile;
+  el.style.display='flex';
+  el.style.background=`linear-gradient(135deg,${p.color}20,${p.color}10)`;
+  el.style.border=`1px solid ${p.color}44`;
+  el.innerHTML=`
+    <span class="grade-banner-emoji">${p.emoji}</span>
+    <div style="flex:1">
+      <div class="grade-banner-name">Hey ${STATE.studentName}! 👋</div>
+      <div class="grade-banner-sub">${STATE.gradeKey} · ${p.level} · Goal: ${STATE.studyGoal}</div>
+    </div>
+    <button class="grade-change-btn" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44" onclick="goToOnboarding()">Change</button>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DAILY CHALLENGE
+// ═══════════════════════════════════════════════════════════════════
+function renderChallenge(){
+  var challenges=STATE.gradeKey&&GRADE_CHALLENGES[STATE.gradeKey]?GRADE_CHALLENGES[STATE.gradeKey]:DEFAULT_CHALLENGES;
+  var ch=challenges[Math.floor(Math.random()*challenges.length)];
+  var col=SUBJECT_COLORS[ch.subject]||'#7c3aed';
+  var el=document.getElementById('challenge-card');
+  if(!el)return;
+  if(!STATE.challengeDone){
+    var hintHtml=ch.hint?'<div style="font-size:12px;color:var(--muted);margin-bottom:9px">💡 Hint: '+ch.hint+'</div>':'';
+    el.innerHTML='<div style="display:flex;justify-content:space-between;margin-bottom:8px">'
+      +'<span class="subject-tag" style="background:'+col+'22;border:1px solid '+col+'44;color:'+col+'">'+ch.subject+'</span>'
+      +'<span style="font-size:13px;font-weight:800;color:#fbbf24">+'+ch.xp+' XP</span>'
+      +'</div>'
+      +'<div style="font-weight:700;font-size:14px;margin-bottom:9px;line-height:1.5">'+ch.question+'</div>'
+      +hintHtml
+      +'<input class="input-field" id="challenge-input" placeholder="Your answer..." style="margin-bottom:8px" oninput="document.getElementById(&quot;challenge-submit&quot;).className=&quot;btn btn-amber&quot;">'
+      +'<button class="btn btn-disabled" id="challenge-submit" onclick="submitChallenge('+ch.xp+')">Submit Challenge ⚡</button>';
+  }
+}
+
+
+async function submitChallenge(xpAmt){
+  const ans=document.getElementById('challenge-input')?.value||'';
+  if(!ans.trim())return;
+  const el=document.getElementById('challenge-card');
+  el.innerHTML=`<div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div><div style="text-align:center;font-weight:700;color:var(--amber)">Checking...</div>`;
+  try{
+    const res=await callAI(
+      'You are an encouraging AI tutor. Evaluate the student\'s answer briefly. Format:\n## Result\n[Correct/Partially Correct/Incorrect]\n## Feedback\n[2-3 sentences of encouragement and explanation]',
+      `Question: ${document.querySelector('#challenge-card')?.dataset?.q||'challenge question'}\nStudent answer: ${ans}`
+    );
+    STATE.challengeDone=true;
+    addXp(xpAmt);
+    el.innerHTML=`<div style="font-size:30px;text-align:center;margin-bottom:8px">🎉</div>`+renderSectionsHTML(res,[
+      {h:'## Result',color:'#10b981'},{h:'## Feedback',color:'#6366f1'}
+    ])+`<div style="text-align:center;font-weight:800;color:var(--amber);margin-top:8px">+${xpAmt} XP earned!</div>`;
+  }catch(e){el.innerHTML=`<div style="color:var(--red)">❌ Error. Please check your connection.</div>`}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PERFORMANCE SNAPSHOT
+// ═══════════════════════════════════════════════════════════════════
+function renderPerfSnap(){
+  const el=document.getElementById('perf-snap');
+  const entries=Object.entries(WEAK_TOPICS).slice(0,4);
+  el.innerHTML=entries.map(([subj,data])=>{
+    const col=SUBJECT_COLORS[subj]||'#7c3aed';
+    const pct=data.accuracy;
+    const colFill=pct>=75?'linear-gradient(90deg,#10b981,#06b6d4)':pct>=60?'linear-gradient(90deg,#f59e0b,#f97316)':'linear-gradient(90deg,#ef4444,#f43f5e)';
+    const textCol=pct>=75?'#10b981':pct>=60?'#f59e0b':'#ef4444';
+    return `<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${col};flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:3px"><span>${subj}</span><span style="color:${textCol}">${pct}%</span></div>
+        <div class="progress-bar" style="height:6px"><div class="progress-fill" style="width:${pct}%;background:${colFill}"></div></div>
+      </div></div>`;
+  }).join('')+`<div style="font-size:12px;color:var(--accent);font-weight:700;text-align:center;margin-top:4px">View Full Dashboard →</div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  SOLVE / CHECK
+// ═══════════════════════════════════════════════════════════════════
+function setMode(mode){
+  STATE.solveMode=mode;
+  document.getElementById('mode-solve-btn').classList.toggle('active',mode==='solve');
+  document.getElementById('mode-check-btn').classList.toggle('active',mode==='check');
+  document.getElementById('student-answer-wrap').style.display=mode==='check'?'block':'none';
+  document.getElementById('solve-btn').textContent=mode==='check'?'🔍 Check My Answer':'✨ Solve & Explain';
+}
+
+function setExplainMode(m){
+  STATE.explainMode=m;
+  ['simple','exam','detailed'].forEach(x=>{
+    document.getElementById(`mode-${x}`)?.classList.toggle('active',x===m);
+  });
+}
+
+function setDifficulty(d){
+  STATE.difficulty=d;
+  const descs={easy:'🟢 Easy — Simple language, beginner-friendly',medium:'🟡 Medium — Standard curriculum level',hard:'🔴 Hard — Advanced, exam-grade depth',auto:'🤖 Auto — AI adjusts to your accuracy'};
+  ['easy','medium','hard','auto'].forEach(x=>{
+    document.getElementById(`diff-${x}`)?.classList.toggle('active',x===d);
+  });
+  document.getElementById('diff-desc').textContent=descs[d];
+}
+
+function autoDetectSubject(){
+  const q=document.getElementById('question-input').value.toLowerCase();
+  let subj='Math';
+  if(q.includes('x²')||q.includes('equation')||q.includes('algebra')||q.includes('calculus'))subj='Math';
+  else if(q.includes('newton')||q.includes('force')||q.includes('velocity')||q.includes('wave'))subj='Physics';
+  else if(q.includes('atom')||q.includes('element')||q.includes('reaction')||q.includes('molecule'))subj='Chemistry';
+  else if(q.includes('cell')||q.includes('dna')||q.includes('photosynthesis'))subj='Biology';
+  else if(q.includes('poem')||q.includes('metaphor')||q.includes('essay')||q.includes('grammar'))subj='English';
+  else if(q.includes('war')||q.includes('revolution')||q.includes('century'))subj='History';
+  else if(q.includes('quran')||q.includes('surah')||q.includes('ayah')||q.includes('iqra'))subj='Quran';
+  else if(q.includes('salah')||q.includes('wudu')||q.includes('fiqh')||q.includes('zakah'))subj='Fiqh';
+  else if(q.includes('tajweed')||q.includes('makharij')||q.includes('noon sakinah'))subj='Tajweed';
+  else if(q.includes('allah')||q.includes('prophet')||q.includes('hadith')||q.includes('islam')||q.includes('muslim'))subj='Islamic Studies';
+  else if(q.includes('aqeedah')||q.includes('tawheed')||q.includes('iman'))subj='Aqeedah';
+  else if(q.includes('seerah')||q.includes('hijra')||q.includes('sahabah'))subj='Seerah';
+  document.getElementById('subject-select').value=subj;
+  STATE.currentSubject=subj;
+  updateSolveBtn();
+}
+
+function updateSolveBtn(){
+  const q=document.getElementById('question-input').value.trim();
+  const btn=document.getElementById('solve-btn');
+  const canSolve=!STATE.teacherMode||(STATE.solveCount<STATE.teacherSettings.maxSolves);
+  if(q&&canSolve){btn.className='btn btn-main';btn.disabled=false;}
+  else{btn.className='btn btn-disabled';btn.disabled=true;}
+}
+
+document.addEventListener('input',e=>{if(e.target.id==='question-input')updateSolveBtn()});
+
+async function handleSolve(){
+  const q=document.getElementById('question-input').value.trim();
+  if(!q||STATE.isProcessing)return;
+  if(STATE.teacherMode&&STATE.solveCount>=STATE.teacherSettings.maxSolves){
+    showToast('Daily solve limit reached!','var(--red)');return;
+  }
+  STATE.isProcessing=true;
+  STATE.currentQuestion=q;
+  STATE.currentSubject=document.getElementById('subject-select').value;
+  STATE.solveCount++;
+  document.getElementById('solve-loading').style.display='block';
+  document.getElementById('solve-result').style.display='none';
+  document.getElementById('solve-btn').className='btn btn-disabled';
+  document.getElementById('solve-btn').textContent='⚡ AI Thinking...';
+  updateTeacherBanner();
+
+  const langMap={en:'English',ta:'Tamil',ja:'Japanese',hi:'Hindi',ar:'Arabic'};
+  const langName=langMap[STATE.lang]||'English';
+  const modeNote=STATE.explainMode==='simple'?'Explain like to a 12-year-old, use simple everyday language':STATE.explainMode==='exam'?'Give concise exam-ready bullet points':'Give thorough university-level explanation with full depth';
+  const antiNote=(STATE.antiCheat||(STATE.teacherMode&&STATE.teacherSettings.hideAnswers))?'DO NOT reveal the final answer — only give hints and guide the student.':'';
+  const gradeNote=STATE.gradeProfile?`Student is in ${STATE.gradeKey} (${STATE.gradeProfile.level}, ages ${STATE.gradeProfile.ages}). Adjust ALL vocabulary and complexity for this age. Tone: ${STATE.gradeProfile.tone}.`:'';
+  const islamicSubjects=['Islamic Studies','Quran','Arabic','Fiqh','Hadith','Aqeedah','Seerah','Tajweed'];
+  const islamicNote=islamicSubjects.includes(STATE.currentSubject)?`This is an Islamic Studies question about ${STATE.currentSubject}. Use respectful Islamic terminology (ﷺ after Prophet Muhammad's name). Reference authentic sources. Be scholarly and accurate.`:'';
+  const diffNote={easy:'Use simple language, beginner level, very step-by-step',medium:'Standard curriculum level',hard:'Advanced terminology, challenge the student, reference deeper theory',auto:'Adjust difficulty based on question complexity'}[STATE.difficulty];
+
+  let sys,usr;
+  if(STATE.solveMode==='check'){
+    sys=`You are StudySnap AI — a caring, encouraging tutor. ${gradeNote} ${islamicNote} ${antiNote} Language: ${langName}.
+Format EXACTLY:
+## ✅ Correct Answer
+[the right answer]
+## 🔍 What the Student Got Right
+[praise specifically]
+## ❌ Exact Mistake Found
+[pinpoint the exact step]
+## 💡 Why It's Wrong
+[explain kindly — ${modeNote}]
+## 🔧 Correction Exercise
+[one targeted practice question]
+## 🌟 Encouragement
+[motivational closing message]`;
+    usr=`Question: ${q}\nStudent's Answer: ${document.getElementById('student-answer').value}`;
+  }else{
+    sys=`You are StudySnap AI — a friendly, encouraging AI tutor. ${antiNote} ${gradeNote} ${islamicNote} Language: ${langName}. ${modeNote}. Difficulty: ${diffNote}.
+Format EXACTLY:
+## ✅ Final Answer
+[clear answer${antiNote?' — show ??? only':''}]
+## 📝 Step-by-Step Solution
+[numbered steps, show all working]
+## 💡 Simple Explanation
+[${modeNote}]
+## 🔄 Alternative Method
+[different approach if possible]
+## 🔑 Key Concept
+[core concept being tested]
+## ⚠️ Common Mistake Warning
+[what students often get wrong]
+## 📌 Quick Revision Note
+[2-3 bullet points to remember]`;
+    usr=`Subject: ${STATE.currentSubject}. Question: ${q}`;
+  }
+
+  try{
+    const res=await callAI(sys,usr);
+    STATE.aiResult=res;
+    STATE.totalSolved++;
+    addXp(20*(STATE.gradeProfile?.xpMult||1));
+    renderSolveResult(res);
+  }catch(e){
+    document.getElementById('solve-result').innerHTML=`<div class="card" style="color:var(--red)">❌ Connection error. Please check your internet and try again.</div>`;
+    document.getElementById('solve-result').style.display='block';
+  }
+  document.getElementById('solve-loading').style.display='none';
+  document.getElementById('solve-btn').className='btn btn-main';
+  document.getElementById('solve-btn').textContent=STATE.solveMode==='check'?'🔍 Check My Answer':'✨ Solve & Explain';
+  STATE.isProcessing=false;
+}
+
+function renderSolveResult(text){
+  const el=document.getElementById('solve-result');
+  const isSolve=STATE.solveMode==='solve';
+  const sections=isSolve?[
+    {h:'## ✅ Final Answer',color:'#10b981'},
+    {h:'## 📝 Step-by-Step Solution',color:'#6366f1'},
+    {h:'## 💡 Simple Explanation',color:'#f59e0b'},
+    {h:'## 🔄 Alternative Method',color:'#8b5cf6'},
+    {h:'## 🔑 Key Concept',color:'#06b6d4'},
+    {h:'## ⚠️ Common Mistake Warning',color:'#ef4444'},
+    {h:'## 📌 Quick Revision Note',color:'#10b981'},
+  ]:[
+    {h:'## ✅ Correct Answer',color:'#10b981'},
+    {h:'## 🔍 What the Student Got Right',color:'#3b82f6'},
+    {h:'## ❌ Exact Mistake Found',color:'#ef4444'},
+    {h:'## 💡 Why It\'s Wrong',color:'#f59e0b'},
+    {h:'## 🔧 Correction Exercise',color:'#8b5cf6'},
+    {h:'## 🌟 Encouragement',color:'#10b981'},
+  ];
+  el.innerHTML=`<div style="font-weight:800;font-size:14px;margin-bottom:10px">${isSolve?'📊 Solution':'🔍 Answer Check Results'}</div>`+
+    renderSectionsHTML(text,sections)+
+    `<div style="margin-top:4px">
+      <button class="voice-btn" id="voice-play-btn" onclick="toggleSpeak()">🔊 Explain Out Loud</button>
+      <div style="display:flex;gap:6px;margin-bottom:6px">
+        '<button class="btn-sm" onclick="setVoiceSpeed(1)" id="spd-1" style="flex:1;border:1px solid var(--border);background:transparent;color:var(--muted)">1x</button>'
+        +'<button class="btn-sm" onclick="setVoiceSpeed(1.5)" id="spd-1.5" style="flex:1;border:1px solid var(--border);background:transparent;color:var(--muted)">1.5x</button>'
+        +'<button class="btn-sm" onclick="setVoiceSpeed(2)" id="spd-2" style="flex:1;border:1px solid var(--border);background:transparent;color:var(--muted)">2x</button>'
+      </div>
+      <div class="btn-row">
+        <button class="btn-outline" style="flex:1;border:1px solid var(--green);color:var(--green)" id="save-rev-btn" onclick="saveToRevision()">💾 Save to Revision</button>
+        <button class="btn-outline" style="flex:1;border:1px solid var(--accent);color:var(--accent)" onclick="resetSolve()">🔄 New Question</button>
+      </div>
+    </div>`;
+  el.style.display='block';
+  STATE.savedToRevision=false;
+}
+
+function resetSolve(){
+  document.getElementById('question-input').value='';
+  document.getElementById('student-answer').value='';
+  document.getElementById('solve-result').style.display='none';
+  document.getElementById('uploaded-preview').style.display='none';
+  STATE.aiResult=null;STATE.uploadedImage=null;
+  updateSolveBtn();
+}
+
+function saveToRevision(){
+  if(!STATE.aiResult||STATE.savedToRevision)return;
+  const answer=extractSection(STATE.aiResult,'## ✅ Final Answer')||extractSection(STATE.aiResult,'## ✅ Correct Answer')||'See full solution';
+  STATE.revisionItems.unshift({id:Date.now(),subject:STATE.currentSubject,question:STATE.currentQuestion.substring(0,60)+(STATE.currentQuestion.length>60?'...':''),answer:answer.substring(0,100),important:false,date:'Today'});
+  STATE.savedToRevision=true;
+  const btn=document.getElementById('save-rev-btn');
+  if(btn){btn.textContent='✅ Saved!';btn.style.color='var(--green)';}
+  showToast('Saved to revision folder!','var(--green)');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  VOICE INPUT
+// ═══════════════════════════════════════════════════════════════════
+let recognition=null;
+function toggleVoiceInput(){
+  if(STATE.isListening){stopListening();return;}
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){showToast('Voice input not supported in this browser. Try Chrome.','var(--red)');return;}
+  recognition=new SR();
+  recognition.continuous=false;recognition.interimResults=true;
+  const langMap2={en:'en-US',ta:'ta-IN',ja:'ja-JP',hi:'hi-IN',ar:'ar-SA'};
+  recognition.lang=langMap2[STATE.lang]||'en-US';
+  recognition.onstart=()=>{
+    STATE.isListening=true;
+    const btn=document.getElementById('voice-input-btn');
+    btn.style.background='linear-gradient(135deg,#ef4444,#f43f5e)';
+    btn.textContent='⏹ Stop Listening';
+    const vs=document.getElementById('voice-status');
+    vs.style.display='block';vs.style.background='rgba(239,68,68,.15)';vs.style.color='var(--red)';vs.style.border='1px solid rgba(239,68,68,.3)';
+    vs.textContent='🔴 Listening...';
+  };
+  recognition.onresult=e=>{
+    const t=Array.from(e.results).map(r=>r[0].transcript).join('');
+    document.getElementById('question-input').value=t;
+    document.getElementById('voice-status').textContent=`✅ Heard: "${t.substring(0,50)}${t.length>50?'...':''}"`;
+    document.getElementById('voice-status').style.background='rgba(16,185,129,.12)';document.getElementById('voice-status').style.color='var(--green)';
+    autoDetectSubject();updateSolveBtn();
+  };
+  recognition.onerror=e=>{showToast(`Mic error: ${e.error}. Allow microphone access.`,'var(--red)');stopListening();};
+  recognition.onend=()=>stopListening();
+  recognition.start();
+}
+function stopListening(){
+  recognition?.stop();STATE.isListening=false;
+  const btn=document.getElementById('voice-input-btn');
+  if(btn){btn.style.background='linear-gradient(135deg,#0ea5e9,#6366f1)';btn.textContent='🎙️ Speak Question';}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  VOICE OUTPUT (Text to Speech)
+// ═══════════════════════════════════════════════════════════════════
+let currentUtterance=null;
+function toggleSpeak(){
+  if(speechSynthesis.speaking){speechSynthesis.cancel();updateVoiceBtn(false);return;}
+  if(!STATE.aiResult)return;
+  const txt=STATE.aiResult.replace(/##\s*/g,'').replace(/\*/g,'');
+  currentUtterance=new SpeechSynthesisUtterance(txt);
+  currentUtterance.rate=STATE.voiceSpeed;
+  currentUtterance.pitch=1;
+  const voices=speechSynthesis.getVoices();
+  const v=voices.find(v=>v.lang.startsWith('en'))||voices[0];
+  if(v)currentUtterance.voice=v;
+  currentUtterance.onend=()=>updateVoiceBtn(false);
+  currentUtterance.onerror=()=>updateVoiceBtn(false);
+  speechSynthesis.speak(currentUtterance);
+  updateVoiceBtn(true);
+}
+function updateVoiceBtn(playing){
+  const btn=document.getElementById('voice-play-btn');
+  if(btn)btn.innerHTML=playing?'⏹ Stop Speaking':'🔊 Explain Out Loud';
+}
+function setVoiceSpeed(s){
+  STATE.voiceSpeed=s;
+  [1,1.5,2].forEach(sp=>{
+    const b=document.getElementById(`spd-${sp}`);
+    if(b){b.style.background=sp===s?'rgba(124,58,237,.2)':'transparent';b.style.color=sp===s?'var(--accent)':'var(--muted)';b.style.borderColor=sp===s?'var(--accent)':'var(--border)';}
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FILE UPLOADS
+// ═══════════════════════════════════════════════════════════════════
+function triggerUpload(id){document.getElementById(id)?.click();}
+function handlePhotoUpload(e,type){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    if(type==='solve'){
+      STATE.uploadedImage=ev.target.result;
+      const prev=document.getElementById('uploaded-preview');
+      prev.src=ev.target.result;prev.style.display='block';
+      document.getElementById('question-input').value='Solve the question shown in this image.';
+      switchTab('solve');autoDetectSubject();updateSolveBtn();
+    }else if(type==='hw'){
+      STATE.hwImage=ev.target.result;
+      document.getElementById('question-input').value='Please analyse my handwritten work and find any errors.';
+      switchTab('solve');
+      const prev=document.getElementById('uploaded-preview');
+      prev.src=ev.target.result;prev.style.display='block';
+      updateSolveBtn();
+    }else if(type==='textbook'){
+      STATE.textbookImage=ev.target.result;
+      const prev=document.getElementById('textbook-preview');
+      prev.src=ev.target.result;prev.style.display='block';
+    }
+  };
+  reader.readAsDataURL(file);
+  e.target.value='';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TEXTBOOK SCANNER
+// ═══════════════════════════════════════════════════════════════════
+async function scanTextbook(){
+  document.getElementById('textbook-loading').style.display='block';
+  document.getElementById('textbook-result').innerHTML='';
+  document.getElementById('scan-btn').textContent='📖 Analysing...';
+  try{
+    const res=await callAI(
+      `You are StudySnap AI. The student scanned a textbook page.
+Format EXACTLY:
+## 📖 Page Summary
+[3-4 sentence summary]
+## 🔑 Key Formulas & Definitions
+[extract all formulas/definitions as bullet points]
+## 💡 Main Concepts
+[3-5 core ideas explained simply]
+## 📝 Flashcard Suggestions
+[suggest 3 flashcards: Q: ... | A: ...]
+## 🎯 Likely Exam Questions
+[2-3 probable exam questions]`,
+      'Textbook page scanned. Assume it covers energy, work, and power in physics for high school.'
+    );
+    document.getElementById('textbook-result').innerHTML=renderSectionsHTML(res,[
+      {h:'## 📖 Page Summary',color:'#06b6d4'},
+      {h:'## 🔑 Key Formulas & Definitions',color:'#6366f1'},
+      {h:'## 💡 Main Concepts',color:'#f59e0b'},
+      {h:'## 📝 Flashcard Suggestions',color:'#8b5cf6'},
+      {h:'## 🎯 Likely Exam Questions',color:'#10b981'},
+    ]);
+    addXp(25);
+  }catch(e){document.getElementById('textbook-result').innerHTML=`<div class="card" style="color:var(--red)">❌ Error. Please try again.</div>`;}
+  document.getElementById('textbook-loading').style.display='none';
+  document.getElementById('scan-btn').textContent='🔬 Scan & Analyse';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  FLASHCARDS
+// ═══════════════════════════════════════════════════════════════════
+function renderFlashcard(){
+  const fc=FLASHCARDS[STATE.flashcardIndex];
+  const col=SUBJECT_COLORS[fc.subject]||'#7c3aed';
+  const el=document.getElementById('flashcard-wrap');
+  if(!el)return;
+  el.innerHTML=`<div class="flashcard" style="background:linear-gradient(135deg,${col}22,${col}10);border:1px solid ${col}44" onclick="flipFlashcard()">
+    <div class="fc-subject" style="color:${col}">${fc.subject} · TAP TO FLIP</div>
+    <div class="fc-text" style="color:${STATE.flashcardFlipped?col:'var(--text)'}">${STATE.flashcardFlipped?fc.back:fc.front}</div>
+    <div class="fc-counter">${STATE.flashcardIndex+1} / ${FLASHCARDS.length}</div>
+  </div>`;
+}
+function flipFlashcard(){STATE.flashcardFlipped=!STATE.flashcardFlipped;renderFlashcard();}
+function nextFlashcard(){STATE.flashcardIndex=(STATE.flashcardIndex+1)%FLASHCARDS.length;STATE.flashcardFlipped=false;renderFlashcard();}
+function prevFlashcard(){STATE.flashcardIndex=Math.max(0,STATE.flashcardIndex-1);STATE.flashcardFlipped=false;renderFlashcard();}
+
+// ═══════════════════════════════════════════════════════════════════
+//  ISLAMIC HUB
+// ═══════════════════════════════════════════════════════════════════
+function islamicTab(tab){
+  STATE.islamicSubTab=tab;
+  document.querySelectorAll('#tab-islamic .tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',['hub','topics','flashcards','duas'][i]===tab);
+  });
+  renderIslamicContent();
+}
+
+function renderIslamicContent(){
+  var el=document.getElementById('islamic-content');
+  if(!el)return;
+  var tab=STATE.islamicSubTab;
+  var html='';
+
+  if(tab==='hub'){
+    var topicGrid='';
+    Object.entries(ISLAMIC_TOPICS).forEach(function(entry){
+      var key=entry[0], t=entry[1];
+      topicGrid+='<button onclick="selectIslamicTopic(\''+key+'\')" style="padding:13px 11px;background:'+t.color+'18;border:1px solid '+t.color+'44;border-radius:15px;cursor:pointer;text-align:left;font-family:inherit">'
+        +'<div style="font-size:26px;margin-bottom:6px">'+t.icon+'</div>'
+        +'<div style="font-weight:800;font-size:13px;color:'+t.color+'">'+key+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+t.desc.substring(0,42)+'...</div>'
+        +'</button>';
+    });
+    var facts=[
+      {i:'📖',f:'The Quran has 114 Surahs, 30 Juz, and 6,236 Ayaat'},
+      {i:'🕌',f:'Muslims pray 5 times a day facing the Qiblah in Makkah'},
+      {i:'⭐',f:'There are 25 Prophets mentioned by name in the Quran'},
+      {i:'📜',f:'The 6 major Hadith collections are called Kutub al-Sittah'},
+    ];
+    var factsHtml='';
+    facts.forEach(function(f){
+      factsHtml+='<div class="fact-card"><span class="fact-icon">'+f.i+'</span><div class="fact-text">'+f.f+'</div></div>';
+    });
+    html='<div style="background:linear-gradient(135deg,rgba(22,163,74,.2),rgba(13,148,136,.15));border:1px solid rgba(22,163,74,.35);border-radius:18px;padding:17px;margin-bottom:14px;text-align:center">'
+      +'<div style="font-size:36px;margin-bottom:6px">☪️</div>'
+      +'<div style="font-weight:900;font-size:18px;color:var(--islamic);margin-bottom:4px">Assalamu Alaikum!</div>'
+      +'<div style="font-size:13px;color:var(--muted);line-height:1.7">Your complete Islamic Studies companion. Learn Quran, Fiqh, Arabic, Hadith, Aqeedah and more — with AI explanations tailored to your level.</div>'
+      +'</div>'
+      +'<div class="section-head">📚 ISLAMIC SUBJECTS</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'+topicGrid+'</div>'
+      +'<div class="section-head">⭐ DID YOU KNOW?</div>'
+      +factsHtml;
+
+  }else if(tab==='topics'){
+    if(!STATE.islamicSelectedTopic){
+      var topicList='';
+      Object.entries(ISLAMIC_TOPICS).forEach(function(entry){
+        var key=entry[0], t=entry[1];
+        var tags='';
+        t.chapters.slice(0,3).forEach(function(c){ tags+='<span class="topic-tag" style="background:'+t.color+'18;color:'+t.color+'">'+c+'</span>'; });
+        topicList+='<button class="topic-card" style="background:'+t.color+'10;border:1px solid '+t.color+'44" onclick="selectIslamicTopic(\''+key+'\')">'
+          +'<div class="topic-icon-wrap" style="background:'+t.color+'22;border:1px solid '+t.color+'44">'+t.icon+'</div>'
+          +'<div style="flex:1">'
+          +'<div class="topic-name" style="color:'+t.color+'">'+key+'</div>'
+          +'<div class="topic-desc">'+t.desc+'</div>'
+          +'<div class="topic-tags">'+tags+'<span style="font-size:10px;color:var(--muted)">+'+(t.chapters.length-3)+'</span></div>'
+          +'</div>'
+          +'<span style="color:'+t.color+';font-size:20px">›</span>'
+          +'</button>';
+      });
+      html=topicList;
+    }else{
+      var t=ISLAMIC_TOPICS[STATE.islamicSelectedTopic];
+      var chapHtml='';
+      t.chapters.forEach(function(ch,i){
+        chapHtml+='<button onclick="askIslamicQuestion(\''+STATE.islamicSelectedTopic+'\',\''+ch.replace(/'/g,"\\'")+'\')" style="width:100%;display:flex;align-items:center;gap:10px;padding:12px 13px;background:var(--card2);border:1px solid '+t.color+'22;border-radius:13px;margin-bottom:8px;cursor:pointer;text-align:left;font-family:inherit;color:var(--text)">'
+          +'<div style="width:27px;height:27px;border-radius:50%;background:'+t.color+'22;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:'+t.color+';flex-shrink:0">'+(i+1)+'</div>'
+          +'<div style="flex:1;font-weight:700;font-size:13px">'+ch+'</div>'
+          +'<span style="color:'+t.color+'">›</span>'
+          +'</button>';
+      });
+      var subHtml='';
+      t.subtopics.forEach(function(st){
+        subHtml+='<button class="subtopic-chip" style="background:'+t.color+'18;color:'+t.color+';border:1px solid '+t.color+'33" onclick="askIslamicQuestion(\''+STATE.islamicSelectedTopic+'\',\''+st.replace(/'/g,"\\'")+'\')">'+st+'</button>';
+      });
+      html='<button onclick="STATE.islamicSelectedTopic=null;renderIslamicContent()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;margin-bottom:12px;padding:0;font-family:inherit">← Back to Subjects</button>'
+        +'<div style="background:linear-gradient(135deg,'+t.color+'22,'+t.color+'10);border:1px solid '+t.color+'44;border-radius:18px;padding:17px;margin-bottom:14px">'
+        +'<div style="font-size:36px;margin-bottom:8px">'+t.icon+'</div>'
+        +'<div style="font-weight:900;font-size:20px;color:'+t.color+'">'+STATE.islamicSelectedTopic+'</div>'
+        +'<div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.6">'+t.desc+'</div>'
+        +'</div>'
+        +'<div class="section-head">📋 CHAPTERS</div>'
+        +chapHtml
+        +'<div class="section-head">🎯 KEY SUBTOPICS</div>'
+        +'<div class="subtopic-chips">'+subHtml+'</div>'
+        +'<button class="btn" style="background:linear-gradient(135deg,'+t.color+',#0d9488)" onclick="askIslamicQuestion(\''+STATE.islamicSelectedTopic+'\',\'give me a comprehensive overview\')">🤖 Ask AI About '+STATE.islamicSelectedTopic+'</button>';
+    }
+
+  }else if(tab==='flashcards'){
+    var fc=ISLAMIC_FLASHCARDS[STATE.islamicFlashIndex];
+    var subColor=SUBJECT_COLORS[fc.subject]||'#16a34a';
+    var fcText=STATE.islamicFlashFlipped?fc.back:fc.front;
+    var fcColor=STATE.islamicFlashFlipped?'var(--islamic)':'var(--text)';
+    var subjectBtns='';
+    Object.keys(ISLAMIC_TOPICS).forEach(function(s){
+      subjectBtns+='<button style="padding:6px 12px;border-radius:20px;background:rgba(22,163,74,.12);border:1px solid rgba(22,163,74,.25);color:var(--islamic);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">'+s+'</button>';
+    });
+    html='<div class="flashcard" style="background:linear-gradient(135deg,rgba(22,163,74,.2),rgba(13,148,136,.15));border:1px solid rgba(22,163,74,.4)" onclick="flipIslamicCard()">'
+      +'<div class="fc-subject" style="color:var(--islamic)">'+fc.subject+' · TAP TO FLIP</div>'
+      +'<div class="fc-text" style="color:'+fcColor+';font-size:14px">'+fcText+'</div>'
+      +'<div class="fc-counter">'+(STATE.islamicFlashIndex+1)+' / '+ISLAMIC_FLASHCARDS.length+'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:12px">'
+      +'<button class="btn-outline" style="flex:1;border:1px solid var(--border);color:var(--muted)" onclick="prevIslamicCard()">← Prev</button>'
+      +'<button class="btn-outline" style="flex:1;border:1px solid var(--islamic);color:var(--islamic)" onclick="nextIslamicCard()">Next →</button>'
+      +'</div>'
+      +'<div class="section-head">📚 ALL SUBJECTS</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:6px">'+subjectBtns+'</div>';
+
+  }else if(tab==='duas'){
+    var duasHtml='<div style="background:linear-gradient(135deg,rgba(22,163,74,.15),rgba(5,150,105,.1));border:1px solid rgba(22,163,74,.3);border-radius:14px;padding:13px;margin-bottom:13px;text-align:center">'
+      +'<div style="font-size:20px;font-weight:800;color:var(--islamic);margin-bottom:4px">🤲 Daily Duas</div>'
+      +'<div style="font-size:12px;color:var(--muted)">Essential duas for every student and Muslim</div>'
+      +'</div>';
+    DUAS.forEach(function(d){
+      duasHtml+='<div class="dua-card" style="background:'+d.color+'0d;border:1px solid '+d.color+'33">'
+        +'<div class="dua-title" style="color:'+d.color+'">'+d.title+'</div>'
+        +'<div class="dua-arabic" style="color:'+d.color+'">'+d.arabic+'</div>'
+        +'<div class="dua-trans">'+d.trans+'</div>'
+        +'<div class="dua-meaning">'+d.meaning+'</div>'
+        +'<div class="dua-source" style="color:'+d.color+'">📚 Source: '+d.source+'</div>'
+        +'<button class="btn-sm" style="background:'+d.color+'18;color:'+d.color+';border:1px solid '+d.color+'33;width:100%;margin-top:8px" onclick="speakText(\''+d.trans.replace(/'/g,"\\'")+'\')")>🔊 Listen</button>'
+        +'</div>';
+    });
+    html=duasHtml;
+  }
+  el.innerHTML=html;
+}
+
+function selectIslamicTopic(key){
+  STATE.islamicSelectedTopic=key;
+  STATE.islamicSubTab='topics';
+  document.querySelectorAll('#tab-islamic .tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',i===1);
+  });
+  renderIslamicContent();
+}
+
+function askIslamicQuestion(subject,chapter){
+  STATE.currentSubject=subject;
+  document.getElementById('subject-select').value=subject;
+  document.getElementById('question-input').value=`Explain: ${chapter} in ${subject}`;
+  switchTab('solve');
+  updateSolveBtn();
+}
+
+function flipIslamicCard(){STATE.islamicFlashFlipped=!STATE.islamicFlashFlipped;renderIslamicContent();}
+function nextIslamicCard(){STATE.islamicFlashIndex=(STATE.islamicFlashIndex+1)%ISLAMIC_FLASHCARDS.length;STATE.islamicFlashFlipped=false;renderIslamicContent();}
+function prevIslamicCard(){STATE.islamicFlashIndex=Math.max(0,STATE.islamicFlashIndex-1);STATE.islamicFlashFlipped=false;renderIslamicContent();}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TRACKER
+// ═══════════════════════════════════════════════════════════════════
+function renderTracker(){
+  var statsEl=document.getElementById('tracker-stats');
+  if(statsEl){
+    var statsData=[
+      {label:'Questions',val:STATE.totalSolved,icon:'🎯'},
+      {label:'Avg Accuracy',val:'72%',icon:'📈'},
+      {label:'Day Streak',val:STATE.streak,icon:'🔥'},
+    ];
+    var shtml='';
+    statsData.forEach(function(s){
+      shtml+='<div class="stat-card">'
+        +'<div style="font-size:20px;margin-bottom:4px">'+s.icon+'</div>'
+        +'<div class="stat-num">'+s.val+'</div>'
+        +'<div class="stat-label">'+s.label+'</div>'
+        +'</div>';
+    });
+    statsEl.innerHTML=shtml;
+  }
+  var subjEl=document.getElementById('tracker-subjects');
+  if(!subjEl)return;
+  var html='';
+  Object.entries(WEAK_TOPICS).forEach(function(entry){
+    var subj=entry[0], data=entry[1];
+    var col=SUBJECT_COLORS[subj]||'#7c3aed';
+    var pct=data.accuracy;
+    var fillCol=pct>=75?'linear-gradient(90deg,#10b981,#06b6d4)':pct>=60?'linear-gradient(90deg,#f59e0b,#f97316)':'linear-gradient(90deg,#ef4444,#f43f5e)';
+    var textCol=pct>=75?'#10b981':pct>=60?'#f59e0b':'#ef4444';
+    var chapHtml='';
+    Object.entries(data.chapters).forEach(function(ce){
+      var ch=ce[0], cd=ce[1];
+      var cf=cd.a>=75?'#10b981':cd.a>=60?'#f59e0b':'#ef4444';
+      var trend=cd.t==='up'?'↑':cd.t==='down'?'↓':'→';
+      var tColor=cd.t==='up'?'#10b981':cd.t==='down'?'#ef4444':'#f59e0b';
+      chapHtml+='<div class="chapter-row">'
+        +'<div class="chapter-name">'+ch+'</div>'
+        +'<div class="chapter-bar"><div class="chapter-fill" style="width:'+cd.a+'%;background:'+cf+'"></div></div>'
+        +'<div class="chapter-pct" style="color:'+cf+'">'+cd.a+'%</div>'
+        +'<div class="chapter-trend" style="color:'+tColor+'">'+trend+'</div>'
+        +'</div>';
+    });
+    html+='<div class="tracker-subject">'
+      +'<div class="tracker-row">'
+      +'<div class="tracker-name"><div style="width:9px;height:9px;border-radius:50%;background:'+col+'"></div>'+subj+'</div>'
+      +'<div class="tracker-pct" style="color:'+textCol+'">'+pct+'%</div>'
+      +'</div>'
+      +'<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+fillCol+'"></div></div>'
+      +'<div style="margin-top:10px">'+chapHtml+'</div>'
+      +'<button class="btn-sm" style="width:100%;margin-top:7px;background:'+col+'18;color:'+col+';border:1px solid '+col+'33;font-size:12px" '
+      +'onclick="document.getElementById(\'subject-select\').value=\''+subj+'\';document.getElementById(\'question-input\').value=\'Give me a practice question for my weak areas in '+subj+'\';switchTab(\'solve\');updateSolveBtn()">'
+      +'Practice '+subj+' Weak Topics →'
+      +'</button>'
+      +'</div>';
+  });
+  subjEl.innerHTML=html;
+}
+
+
+// ═══════════════════════════════════════════════════════════════════
+//  PLANNER & COUNTDOWN
+// ═══════════════════════════════════════════════════════════════════
+function startCountdownTimer(){
+  if(STATE.countdownInterval)clearInterval(STATE.countdownInterval);
+  STATE.countdownInterval=setInterval(()=>{
+    if(STATE.activeTab==='planner')renderCountdowns();
+  },1000);
+  renderCountdowns();
+}
+
+function getCountdown(dateStr){
+  const target=new Date(dateStr);target.setHours(23,59,59);
+  const diff=target-new Date();
+  if(diff<=0)return{days:0,hours:0,mins:0,secs:0,passed:true};
+  return{days:Math.floor(diff/86400000),hours:Math.floor((diff%86400000)/3600000),mins:Math.floor((diff%3600000)/60000),secs:Math.floor((diff%60000)/1000),passed:false};
+}
+
+function renderCountdowns(){
+  var el=document.getElementById('countdown-list');
+  if(!el)return;
+  var html='';
+  STATE.countdownExams.forEach(function(exam){
+    var cd=getCountdown(exam.date);
+    var col=exam.color||SUBJECT_COLORS[exam.subject]||'#7c3aed';
+    var urgentCol=cd.days<=1?'var(--red)':cd.days<=3?'var(--amber)':col;
+    var unitBg=cd.days<=1?'rgba(239,68,68,.15)':cd.days<=3?'rgba(245,158,11,.15)':col+'20';
+    var unitBdr=cd.days<=1?'rgba(239,68,68,.3)':cd.days<=3?'rgba(245,158,11,.3)':col+'44';
+    var dateStr=new Date(exam.date).toLocaleDateString('en',{weekday:'short',month:'long',day:'numeric'});
+    var tagBg=col+'22', tagBdr=col+'44';
+    var innerHtml='';
+    if(cd.passed){
+      innerHtml='<div style="text-align:center;padding:10px;background:rgba(16,185,129,.15);border-radius:12px">'
+        +'<div style="font-size:22px">🎉</div>'
+        +'<div style="font-weight:800;color:#10b981">Exam Day Has Passed!</div>'
+        +'</div>';
+    }else{
+      var units=[
+        {v:String(cd.days).padStart(2,'0'),l:'Days'},
+        {v:String(cd.hours).padStart(2,'0'),l:'Hours'},
+        {v:String(cd.mins).padStart(2,'0'),l:'Mins'},
+        {v:String(cd.secs).padStart(2,'0'),l:'Secs'},
+      ];
+      var unitHtml='';
+      units.forEach(function(u){
+        unitHtml+='<div class="countdown-unit" style="background:'+unitBg+';border:1px solid '+unitBdr+'">'
+          +'<div class="countdown-num" style="color:'+urgentCol+'">'+u.v+'</div>'
+          +'<div class="countdown-label">'+u.l+'</div>'
+          +'</div>';
+      });
+      var pct=Math.max(0,100-Math.min(100,(cd.days/30)*100));
+      innerHtml='<div class="countdown-grid">'+unitHtml+'</div>'
+        +'<div class="progress-bar" style="margin-top:11px;height:5px">'
+        +'<div class="progress-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+col+','+col+'88)"></div>'
+        +'</div>'
+        +'<div style="font-size:11px;color:var(--muted);text-align:right;margin-top:3px">'+cd.days+' days remaining</div>';
+    }
+    html+='<div class="countdown-card" style="background:linear-gradient(135deg,'+col+'22,'+col+'10);border:1px solid '+col+'44">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:13px">'
+      +'<div>'
+      +'<span class="subject-tag" style="background:'+tagBg+';border:1px solid '+tagBdr+';color:'+col+'">'+exam.subject+'</span>'
+      +'<div style="font-weight:900;font-size:17px">'+exam.name+'</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin-top:2px">'+dateStr+'</div>'
+      +'</div>'
+      +'<button onclick="removeExam('+exam.id+')" style="background:rgba(239,68,68,.15);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;color:var(--red);font-size:15px">×</button>'
+      +'</div>'
+      +innerHtml
+      +'</div>';
+  });
+  el.innerHTML=html;
+}
+
+
+function addExam(){
+  const name=document.getElementById('exam-name-input').value.trim();
+  const subj=document.getElementById('exam-subj-input').value;
+  const date=document.getElementById('exam-date-input').value;
+  if(!name||!date){showToast('Please enter exam name and date','var(--amber)');return;}
+  STATE.countdownExams.push({id:Date.now(),name,date,subject:subj,color:SUBJECT_COLORS[subj]||'#7c3aed'});
+  document.getElementById('exam-name-input').value='';
+  document.getElementById('exam-date-input').value='';
+  renderCountdowns();
+  showToast('Exam added!','var(--green)');
+}
+
+function removeExam(id){
+  STATE.countdownExams=STATE.countdownExams.filter(e=>e.id!==id);
+  renderCountdowns();
+}
+
+async function generatePlan(){
+  const subj=document.getElementById('plan-subj').value;
+  const date=document.getElementById('plan-date').value;
+  if(!date){showToast('Please select an exam date','var(--amber)');return;}
+  const btn=document.getElementById('plan-btn');
+  btn.textContent='📅 Building Plan...';btn.className='btn btn-disabled';
+  const daysLeft=Math.max(1,Math.floor((new Date(date)-new Date())/86400000));
+  try{
+    const res=await callAI(
+      `You are a study planner AI. Create a concise daily revision schedule.
+Format EXACTLY:
+## 📅 Study Schedule Overview
+[brief overview]
+## 📆 Daily Plan
+[Day 1: Topic | Day 2: Topic | Day 3: Topic etc., max 7 days]
+## 🎯 Priority Topics
+[ranked list of what to study first]
+## ⚡ Quick Win Tips
+[3 tips to maximise exam performance]
+## ⏰ Recommended Daily Study Time
+[suggested hours and when]`,
+      `Subject: ${subj}. Exam date: ${date}. Days remaining: ${daysLeft}.`
+    );
+    document.getElementById('plan-result').innerHTML=`<div style="font-weight:800;font-size:14px;margin-bottom:10px">📋 Your Study Plan — ${subj}</div>`+renderSectionsHTML(res,[
+      {h:'## 📅 Study Schedule Overview',color:'#6366f1'},
+      {h:'## 📆 Daily Plan',color:'#3b82f6'},
+      {h:'## 🎯 Priority Topics',color:'#f59e0b'},
+      {h:'## ⚡ Quick Win Tips',color:'#10b981'},
+      {h:'## ⏰ Recommended Daily Study Time',color:'#8b5cf6'},
+    ]);
+    addXp(10);
+  }catch(e){document.getElementById('plan-result').innerHTML=`<div class="card" style="color:var(--red)">❌ Error generating plan.</div>`;}
+  btn.textContent='🗓️ Generate AI Plan';btn.className='btn btn-main';
+}
+
+function renderPlanner(){
+  renderCountdowns();
+  const lb=document.getElementById('leaderboard');
+  if(lb)lb.innerHTML=[
+    {rank:1,name:'Akira T.',xp:1240,streak:21,flag:'🇯🇵',me:false},
+    {rank:2,name:'Priya S.',xp:1180,streak:15,flag:'🇮🇳',me:false},
+    {rank:3,name:STATE.studentName,xp:STATE.xp,streak:STATE.streak,flag:'🌍',me:true},
+    {rank:4,name:'James K.',xp:165,streak:5,flag:'🇬🇧',me:false},
+    {rank:5,name:'Maria L.',xp:142,streak:4,flag:'🇪🇸',me:false},
+  ].map(p=>`<div class="lb-item ${p.me?'me':''}">
+    <div class="lb-rank" style="background:${p.rank===1?'linear-gradient(135deg,#fbbf24,#f59e0b)':p.rank===2?'linear-gradient(135deg,#94a3b8,#64748b)':p.rank===3?'linear-gradient(135deg,#d97706,#b45309)':'var(--card2)'}">${p.rank}</div>
+    <div class="lb-flag">${p.flag}</div>
+    <div style="flex:1"><div class="lb-name">${p.name}${p.me?' (You)':''}</div><div class="lb-streak">🔥 ${p.streak} streak</div></div>
+    <div class="lb-xp">⚡ ${p.xp}</div>
+  </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  REVISION
+// ═══════════════════════════════════════════════════════════════════
+function renderRevision(){
+  const filtersEl=document.getElementById('rev-filters');
+  if(filtersEl){
+    const subjects=['All',...new Set(STATE.revisionItems.map(i=>i.subject))];
+  var fbtns2='';subjects.forEach(function(s){fbtns2+='<button class="filter-chip '+(s===STATE.revSubjectFilter?'active':'')+' " onclick="setRevFilter(\''+s+'\')" >'+s+'</button>';});filtersEl.innerHTML=fbtns2;
+  }
+  filterRevision();
+}
+
+function setRevFilter(subj){
+  STATE.revSubjectFilter=subj;
+  renderRevision();
+}
+
+function filterRevision(){
+  const q=(document.getElementById('rev-search')?.value||'').toLowerCase();
+  STATE.revSearch=q;
+  const filtered=STATE.revisionItems.filter(i=>{
+    const ms=i.question.toLowerCase().includes(q)||i.answer.toLowerCase().includes(q);
+    const mf=STATE.revSubjectFilter==='All'||i.subject===STATE.revSubjectFilter;
+    return ms&&mf;
+  });
+  const el=document.getElementById('revision-list');
+  if(!el)return;
+  if(!filtered.length){
+    el.innerHTML=`<div class="empty-state"><div class="empty-emoji">📂</div><div>No saved answers yet.<br>Solve questions and save them here!</div></div>`;
+    return;
+  }
+  el.innerHTML=filtered.map(item=>{
+    const col=SUBJECT_COLORS[item.subject]||'#7c3aed';
+    return `<div class="rev-card">
+      <div style="display:flex;align-items:flex-start">
+        <div style="flex:1">
+          <span class="rev-subject" style="background:${col}22;color:${col}">${item.subject}</span>
+          <div class="rev-q">${item.question}</div>
+          <div class="rev-a">${item.answer}</div>
+          <div class="rev-meta">${item.date}</div>
+        </div>
+        <div class="rev-actions">
+          <button class="rev-star" onclick="toggleStar(${item.id})">${item.important?'⭐':'☆'}</button>
+          <button class="rev-del" onclick="deleteRevItem(${item.id})" style="opacity:.45">🗑️</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleStar(id){
+  STATE.revisionItems=STATE.revisionItems.map(i=>i.id===id?{...i,important:!i.important}:i);
+  filterRevision();
+}
+function deleteRevItem(id){
+  STATE.revisionItems=STATE.revisionItems.filter(i=>i.id!==id);
+  filterRevision();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  TEACHER MODE
+// ═══════════════════════════════════════════════════════════════════
+function toggleAntiCheat(){
+  STATE.antiCheat=!STATE.antiCheat;
+  document.getElementById('anticheat-toggle').classList.toggle('on',STATE.antiCheat);
+  document.getElementById('anticheat-setting').textContent=STATE.antiCheat?'On':'Off';
+}
+
+function updateTeacherBanner(){
+  const banner=document.getElementById('teacher-banner');
+  if(!banner)return;
+  banner.style.display=STATE.teacherMode?'flex':'none';
+  if(STATE.teacherMode){
+    document.getElementById('teacher-status-text').textContent=`${STATE.solveCount}/${STATE.teacherSettings.maxSolves} solves used today · Answers ${STATE.teacherSettings.hideAnswers?'hidden':'visible'}`;
+  }
+  document.getElementById('teacher-mode-badge').textContent=STATE.teacherMode?'🔒 ON':'✅ OFF';
+  document.getElementById('teacher-mode-badge').style.background=STATE.teacherMode?'rgba(239,68,68,.2)':'rgba(16,185,129,.2)';
+  document.getElementById('teacher-mode-badge').style.borderColor=STATE.teacherMode?'rgba(239,68,68,.35)':'rgba(16,185,129,.35)';
+  document.getElementById('teacher-mode-badge').style.color=STATE.teacherMode?'var(--red)':'var(--green)';
+}
+
+function renderTeacher(){
+  var el=document.getElementById('teacher-content');
+  if(!el)return;
+  var html='<div class="card" style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);margin-bottom:12px">'
+    +'<div style="font-size:14px;font-weight:800;margin-bottom:5px">👨‍👩‍👧 What is Teacher Mode?</div>'
+    +'<div style="font-size:13px;color:var(--muted);line-height:1.7">Parents and teachers can lock settings, hide final answers, limit daily solves, and restrict subjects — so students learn, not just copy.</div>'
+    +'</div>';
+  if(!STATE.teacherPinSet){
+    html+='<div class="card">'
+      +'<div class="label">🔐 SET 4-DIGIT PIN</div>'
+      +'<input class="input-field" id="pin-input" type="password" maxlength="4" placeholder="••••" style="text-align:center;font-size:22px;letter-spacing:10px;font-weight:800;margin-bottom:10px" oninput="checkPinInput()">'
+      +'<button class="btn btn-disabled" id="set-pin-btn" onclick="setTeacherPin()">Set PIN &amp; Enable Teacher Mode</button>'
+      +'</div>';
+  }else{
+    var tmOn=STATE.teacherMode;
+    var haOn=STATE.teacherSettings.hideAnswers;
+    html+='<div class="card" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'
+      +'<div>'
+      +'<div style="font-weight:800;font-size:15px">🔒 Teacher Mode</div>'
+      +'<div style="font-size:12px;color:var(--muted);margin-top:2px">Restrictions active for student</div>'
+      +'</div>'
+      +'<button class="toggle '+(tmOn?'on':'')+'" onclick="toggleTeacherMode()"></button>'
+      +'</div>'
+      +'<div class="section-head">⚙️ RESTRICTIONS</div>'
+      +'<div class="toggle-wrap">'
+      +'<div><div class="toggle-label">🙈 Hide Final Answers</div><div class="toggle-sub">Student only sees hints</div></div>'
+      +'<button class="toggle '+(haOn?'on':'')+'" onclick="STATE.teacherSettings.hideAnswers=!STATE.teacherSettings.hideAnswers;renderTeacher()"></button>'
+      +'</div>'
+      +'<div class="card2" style="margin-bottom:10px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+      +'<div><div style="font-weight:700;font-size:13px">📊 Daily Solve Limit</div><div style="font-size:11px;color:var(--muted)">Max questions per day</div></div>'
+      +'<div style="font-weight:900;font-size:18px;color:var(--accent)">'+STATE.teacherSettings.maxSolves+'</div>'
+      +'</div>'
+      +'<input type="range" min="1" max="20" value="'+STATE.teacherSettings.maxSolves+'" style="width:100%;accent-color:var(--accent)" oninput="STATE.teacherSettings.maxSolves=parseInt(this.value);this.previousElementSibling.children[1].textContent=this.value">'
+      +'</div>';
+    if(STATE.teacherMode){
+      var reportItems=[
+        {l:'Questions Solved',v:STATE.solveCount,i:'🎯'},
+        {l:'Daily Limit',v:STATE.teacherSettings.maxSolves,i:'📊'},
+        {l:'XP Earned',v:STATE.xp,i:'⚡'},
+        {l:'Streak',v:STATE.streak+' days',i:'🔥'},
+      ];
+      var reportHtml='';
+      reportItems.forEach(function(s){
+        reportHtml+='<div style="background:var(--card2);border-radius:12px;padding:12px;text-align:center">'
+          +'<div style="font-size:20px;margin-bottom:3px">'+s.i+'</div>'
+          +'<div style="font-weight:900;font-size:18px;color:var(--accent)">'+s.v+'</div>'
+          +'<div style="font-size:10px;color:var(--muted);font-weight:700">'+s.l+'</div>'
+          +'</div>';
+      });
+      html+='<div class="section-head">📋 TODAY\'S STUDENT REPORT</div>'
+        +'<div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+reportHtml+'</div>';
+    }
+  }
+  el.innerHTML=html;
+}
+
+
+function checkPinInput(){
+  const v=document.getElementById('pin-input')?.value||'';
+  const btn=document.getElementById('set-pin-btn');
+  if(btn)btn.className=v.length===4?'btn btn-main':'btn btn-disabled';
+}
+
+function setTeacherPin(){
+  const v=document.getElementById('pin-input')?.value||'';
+  if(v.length!==4)return;
+  STATE.teacherPin=v;STATE.teacherPinSet=true;STATE.teacherMode=true;
+  updateTeacherBanner();renderTeacher();
+  showToast('Teacher Mode enabled!','var(--green)');
+}
+
+function toggleTeacherMode(){
+  STATE.teacherMode=!STATE.teacherMode;
+  updateTeacherBanner();renderTeacher();
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════════════════
+function renderProfile(){
+  const lvl=LEVELS.find(l=>STATE.xp>=l.min&&STATE.xp<l.max)||LEVELS[LEVELS.length-1];
+  const profileEmoji=document.getElementById('profile-emoji');
+  const profileName=document.getElementById('profile-name');
+  if(profileEmoji)profileEmoji.textContent=lvl.icon;
+  if(profileName)profileName.textContent=STATE.studentName;
+
+  const pills=document.getElementById('profile-pills');
+  if(pills)pills.innerHTML=`
+    <div class="streak-pill">🔥 ${STATE.streak} streak</div>
+    <div class="xp-pill">⚡ ${STATE.xp} XP</div>
+    ${STATE.isPremium?'<div class="streak-pill" style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(239,68,68,.1));border-color:rgba(245,158,11,.3);color:#fbbf24">💎 PRO</div>':''}
+  `;
+
+  const stats=document.getElementById('profile-stats');
+  if(stats)stats.innerHTML=[
+    {n:STATE.totalSolved,l:'Solved'},{n:STATE.revisionItems.length,l:'Saved'},{n:BADGES.filter(b=>b.earned).length,l:'Badges'}
+  ].map(s=>`<div class="stat-card"><div class="stat-num">${s.n}</div><div class="stat-label">${s.l}</div></div>`).join('');
+
+  const bl=document.getElementById('badge-list');
+  if(bl)bl.innerHTML=BADGES.map(b=>`<div class="badge-card ${b.earned?'earned':'locked'}">
+    <div class="badge-icon-wrap" style="background:${b.earned?'linear-gradient(135deg,rgba(124,58,237,.25),rgba(99,102,241,.2))':'rgba(255,255,255,.04)'}">${b.icon}</div>
+    <div style="flex:1"><div class="badge-name">${b.name}${!b.earned?' 🔒':''}</div><div class="badge-desc">${b.desc}</div></div>
+    <div class="badge-xp">+${b.xp} XP</div>
+  </div>`).join('');
+
+  const lg=document.getElementById('lang-grid');
+  if(lg){var lgBtns='';[{code:'en',flag:'🇬🇧',label:'English'},{code:'ta',flag:'🇮🇳',label:'Tamil'},{code:'ja',flag:'🇯🇵',label:'Japanese'},{code:'hi',flag:'🇮🇳',label:'Hindi'},{code:'ar',flag:'🇸🇦',label:'Arabic'}].forEach(function(l){lgBtns+='<button class="lang-btn '+(STATE.lang===l.code?'active':'')+' " onclick="STATE.lang=\''+l.code+'\';document.getElementById(\'lang-select\').value=\''+l.code+'\';renderProfile();">'+l.flag+' '+l.label+'</button>';});lg.innerHTML=lgBtns;}
+}
+
+function renderPremium(){
+  const el=document.getElementById('premium-section');
+  if(!el)return;
+  if(STATE.isPremium){
+    el.innerHTML=`<div class="premium-active"><div style="font-size:28px;margin-bottom:4px">💎</div><div style="font-weight:800;color:#10b981;font-size:16px">Premium Active!</div><div style="font-size:12px;color:var(--muted);margin-top:4px">Unlimited access to all features</div></div>`;
+  }else{
+    el.innerHTML=`<div class="premium-card">
+      <h3>💎 StudySnap Premium</h3>
+      <p>Unlimited solves • All modes • No ads • PDF export • AI difficulty adjuster • Full syllabus • Offline mode</p>
+      <div class="premium-btns">
+        <button class="prem-btn-monthly" onclick="showToast('Monthly plan selected','var(--accent)')">Monthly ¥300/mo</button>
+        <button class="prem-btn-yearly" onclick="STATE.isPremium=true;renderProfile();renderPremium();showToast('Welcome to Premium! 💎','var(--green)');addXp(50)">Yearly ¥2,400 ⭐</button>
+      </div>
+      <div class="prem-note">~$3/mo · Cancel anytime · Secure payment</div>
+    </div>`;
+  }
+}
+
+function updateLang(){STATE.lang=document.getElementById('lang-select').value;}
+
+// ═══════════════════════════════════════════════════════════════════
+//  DONATE MODAL
+// ═══════════════════════════════════════════════════════════════════
+function openModal(id){
+  const m=document.getElementById(id);m.classList.add('open');
+  if(id==='donate-modal')renderDonate();
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModalOutside(e,id){if(e.target.classList.contains('modal-overlay'))closeModal(id);}
+
+function renderDonate(){
+  var el=document.getElementById('donate-content');
+  if(!el)return;
+  if(!STATE.donateDone){
+    var amts=[{v:'3',l:'$3',sub:'1 coffee'},{v:'5',l:'$5',sub:'2 coffees \u2615'},{v:'10',l:'$10',sub:'Super boost \ud83d\ude80'}];
+    var amtBtns='';
+    amts.forEach(function(a){
+      var active=(STATE.donateAmount===a.v);
+      var bdr=active?'#f59e0b':'var(--border)';
+      var bg=active?'rgba(245,158,11,.18)':'transparent';
+      var clr=active?'#fbbf24':'var(--muted)';
+      amtBtns+='<button onclick="STATE.donateAmount=\''+a.v+'\';document.getElementById(\'custom-amt\').value=\'\';renderDonate()" '
+        +'style="padding:13px 6px;border-radius:13px;border:2px solid '+bdr
+        +';background:'+bg+';cursor:pointer;font-family:inherit;color:'+clr
+        +';font-weight:800;width:100%">'
+        +'<div style="font-size:18px;font-weight:900">'+a.l+'</div>'
+        +'<div style="font-size:11px;margin-top:2px">'+a.sub+'</div>'
+        +'</button>';
+    });
+    var payUrl='https://www.paypal.com/donate/?amount='+STATE.donateAmount+'&currency_code=USD&item_name=StudySnap+AI';
+    el.innerHTML=
+        '<div style="text-align:center;margin-bottom:18px">'
+      + '<div style="font-size:44px;margin-bottom:9px">\u2615</div>'
+      + '<div style="font-size:20px;font-weight:900;margin-bottom:5px">Support StudySnap AI</div>'
+      + '<div style="font-size:13px;color:var(--muted);line-height:1.6">Help keep this free for students worldwide! \ud83d\udc99</div>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:13px">'
+      + amtBtns
+      + '</div>'
+      + '<div style="position:relative;margin-bottom:13px">'
+      + '<span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;font-weight:700">$</span>'
+      + '<input class="input-field" type="number" id="custom-amt" placeholder="Custom amount..." style="padding-left:28px" oninput="STATE.donateAmount=this.value||\'3\'">'
+      + '</div>'
+      + '<a href="'+payUrl+'" target="_blank" rel="noopener" style="display:block;text-decoration:none">'
+      + '<button class="btn btn-amber" style="margin-bottom:8px" onclick="setTimeout(function(){STATE.donateDone=true;renderDonate();},600)">'
+      + '\ud83d\udc9b Donate $'+STATE.donateAmount+' via PayPal'
+      + '</button></a>'
+      + '<a href="https://ko-fi.com" target="_blank" rel="noopener" style="display:block;text-decoration:none">'
+      + '<button class="btn-outline" style="border:1px solid #06b6d4;color:#06b6d4;margin-bottom:8px">\u2615 Buy me a coffee on Ko-fi</button>'
+      + '</a>'
+      + '<div style="text-align:center;font-size:11px;color:var(--muted);margin-bottom:8px">Secure payment \u00b7 No account needed</div>'
+      + '<button onclick="closeModal(\'donate-modal\')" style="width:100%;background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:8px">Maybe later</button>';
+  }else{
+    el.innerHTML=
+        '<div style="text-align:center;padding:18px 0">'
+      + '<div style="font-size:52px;margin-bottom:10px">\ud83c\udf89</div>'
+      + '<div style="font-weight:900;font-size:20px;margin-bottom:5px">Thank you so much!</div>'
+      + '<div style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px">Your support keeps StudySnap AI free for students everywhere. \ud83d\udc99</div>'
+      + '<div style="background:linear-gradient(135deg,rgba(245,158,11,.2),rgba(239,68,68,.15));border:1px solid rgba(245,158,11,.35);border-radius:15px;padding:14px;margin-bottom:15px">'
+      + '<div style="font-size:13px;font-weight:700;color:#fbbf24">\ud83c\udf81 Thank-you gift:</div>'
+      + '<div style="font-size:20px;font-weight:900;margin-top:3px">+100 Bonus XP \u26a1</div>'
+      + '</div>'
+      + '<button class="btn btn-main" onclick="closeModal(\'donate-modal\');addXp(100);showToast(\'Bonus XP claimed! \ud83d\ude80\',\'var(--amber)\')">Claim Bonus XP \ud83d\ude80</button>'
+      + '</div>';
+  }
+}
+
+
+async function callAI(system,user){
+  const response=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:1000,
+      system:system,
+      messages:[{role:'user',content:user}]
+    })
+  });
+  if(!response.ok){const e=await response.json();throw new Error(e.error?.message||'API error');}
+  const data=await response.json();
+  return data.content?.[0]?.text||'No response received.';
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════════
+function extractSection(text,header){
+  if(!text)return'';
+  const escaped=header.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const m=text.match(new RegExp(`${escaped}\\n([\\s\\S]*?)(?=\\n## |$)`));
+  return m?m[1].trim():'';
+}
+
+function renderSectionsHTML(text,sections){
+  return sections.map(({h,color})=>{
+    const content=extractSection(text,h);
+    if(!content)return'';
+    return `<div class="ai-section" style="background:${color}12;border:1px solid ${color}30">
+      <div class="ai-section-title" style="color:${color}">${h.replace('## ','')}</div>
+      <div class="ai-section-body">${content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`;
+  }).join('');
+}
+
+function speakText(text){
+  speechSynthesis.cancel();
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.rate=1;
+  const voices=speechSynthesis.getVoices();
+  const v=voices.find(v=>v.lang.startsWith('en'))||voices[0];
+  if(v)utt.voice=v;
+  speechSynthesis.speak(utt);
+}
+
+function showToast(msg,color){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  Object.assign(t.style,{position:'fixed',bottom:'100px',left:'50%',transform:'translateX(-50%)',background:color||'var(--accent)',color:'#fff',padding:'10px 20px',borderRadius:'20px',fontSize:'13px',fontWeight:'700',zIndex:'999',animation:'fadeUp .3s ease',whiteSpace:'nowrap',maxWidth:'300px',textAlign:'center',boxShadow:'0 4px 16px rgba(0,0,0,.3)'});
+  document.getElementById('app').appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+//  KEYBOARD — close modals
+// ═══════════════════════════════════════════════════════════════════
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+// Init voices for speech synthesis
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+}
+</script>
+</body>
+</html>
